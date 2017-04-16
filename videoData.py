@@ -20,5 +20,24 @@ class videoData:
     def iterator(self,startFrame=0):
 
 
-    def getBlocks
+    def getNextBlock
+
+class compression(videoData):
+
+    def __init(self):
+        self.dctCOEFF = [[],[],[],[],[].....]
+
+    def computeDCT(self):
+        self.getNextBlock()
+
+    def computeIDCT(self):
+
+    def loadFromCMP(self):
+        # set dctCOEFF
+
+    def saveCMP(self):
+        # put DCT into a file
+
+    def quantize(self):
+
 
