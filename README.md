@@ -14,11 +14,9 @@ OpenCV (for DCT/IDCT)
 
 Project: 
 
-
 Language:
 
 Dependencies:
-
 
 How to use:
 
