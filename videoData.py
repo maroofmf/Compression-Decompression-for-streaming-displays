@@ -27,7 +27,7 @@ class videoData:
 			channelOffset = self.__height*self.__width*c		
 			startIndex = frameOffset + channelOffset
 			endIndex =  startIndex + self.__height*self.__width
-			frame[:,:,2-c] = (self.__videoFrames[startIndex:endIndex]).reshape((self.__height,self.__width))		       			    
+			frame[:,:,2-c] = np.copy((self.__videoFrames[startIndex:endIndex]).reshape((self.__height,self.__width)))
 		return frame
 
 
