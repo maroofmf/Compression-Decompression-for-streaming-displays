@@ -1,3 +1,6 @@
 *.pyc
 *.rgb
 *.raw
+*.jpg
+*.JPEG
+*.png
