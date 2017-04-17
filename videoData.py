@@ -8,8 +8,8 @@ Class functions:
 Notes:
 
 '''
+import time
 import numpy as np
-
 class videoData:
     
     #------------------------------ Constructor ------------------------------#
@@ -21,6 +21,7 @@ class videoData:
 	self.totalFrames = len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS)
 	
     def getFrame(self,frameNumber):
+		startTime = time.time()
 		frame = np.empty((self.__height,self.__width, self.__channels),'uint8')
 		frameOffset = frameNumber*self.__height*self.__width*self.__channels
 		for c in range(self.__channels):
@@ -28,7 +29,8 @@ class videoData:
 			startIndex = frameOffset + channelOffset
 			endIndex =  startIndex + self.__height*self.__width
 			frame[:,:,2-c] = np.copy((self.__videoFrames[startIndex:endIndex]).reshape((self.__height,self.__width)))
-		return frame
+		systemTime = time.time() - startTime
+		return systemTime, frame
 
 
     def iterator(self,startFrame=0):
