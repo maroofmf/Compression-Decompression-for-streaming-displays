@@ -19,7 +19,7 @@ class videoData:
         self.__height = HEIGHT
         self.__channels = CHANNELS
         self.totalFrames = len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS)
-
+        print 'videoData constructor'
     def getFrame(self,frameNumber):
         rgbArray = np.zeros((self.__height,self.__width,self.__channels),'uint8')
         # i,j,k = [(frameNumber-1)*HEIGHT*WIDTH*CHANNELS + i*HEIGHT*WIDTH for i in range(3)]
@@ -28,7 +28,9 @@ class videoData:
             for row in range(self.__height):
                 for col in range(self.__width):
                     i = channel*self.__height*self.__width+row*self.__width+col
-                    rgbArray[row][col][channel] = self.__videoFrames[self.__channels*(frameNumber-1)*self.__height*self.__width + i]
+                    rgbArray[row][col][2-channel] = self.__videoFrames[self.__channels*(frameNumber-1)*self.__height*self.__width + i]
+                    
+                    
         return rgbArray
 
 
