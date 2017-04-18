@@ -1,3 +1,4 @@
+
 '''
 Description: Read and index data.
 #----------------------------------------------------------------------------------------------------------------#
@@ -42,7 +43,7 @@ class videoData:
         frameOffset = frameNumber*self.__height*self.__width*self.__channels
         for c in range(self.__channels):
             channelOffset = self.__height*self.__width*c		
-            startIndex = frameOffset + channelOffset + (math.floor((blockNumber) / (self.__width/block_size)) * block_size * block_size) + ((blockNumber)%(self.__width/block_size) * block_size)
+            startIndex = frameOffset + channelOffset + (math.floor((blockNumber) / (self.__width/block_size)) * (self.__width/block_size) * block_size * block_size) + ((blockNumber)%(self.__width/block_size) * block_size)
             
             for index in range(block_size):
 
