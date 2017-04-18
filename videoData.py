@@ -10,7 +10,7 @@ Notes:
 '''
 import numpy as np
 import math
-
+from scipy.fftpack import dct, idct
 class videoData:
     
     #------------------------------ Constructor ------------------------------#
@@ -43,17 +43,12 @@ class videoData:
         for c in range(self.__channels):
             channelOffset = self.__height*self.__width*c		
             startIndex = frameOffset + channelOffset + (math.floor((blockNumber) / (self.__width/block_size)) * block_size * block_size) + ((blockNumber)%(self.__width/block_size) * block_size)
-            #a = self.__videoFrames[startIndex:block_size]
-            print startIndex
-            print block_size
-            print len(a)
+            
             for index in range(block_size):
-                #print (self.__width*(index+1))+startIndex
+
                 b = self.__videoFrames[(self.__width*(index))+startIndex:(self.__width*(index))+startIndex + block_size] 
-                #print len(b)                
+             
                 a[index*block_size:index*block_size + block_size] = b
-                #print b
-#            endIndex =  block_size*block_size
             
             block[:,:,2-c] = np.copy(a.reshape((block_size,block_size)))
             print block[:,:,2-c]
