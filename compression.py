@@ -1,5 +1,5 @@
 '''
-Description: Compression class
+Description: compression class
 -> Obtains 8x8 blocks of the raw video and obtains dct coefficients
 -> Can do the reverse as well
 
