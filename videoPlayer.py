@@ -25,8 +25,8 @@ def main():
 	frame = vidPlayer.getBlock(0,20,16)     
 	#for frame in vidPlayer.iterator():
 	cv2.imshow('frame',frame)
-	if cv2.waitKey(0):  
-         print 'hi'     
+	cv2.waitKey(0)  
+         #print 'hi'     
 #        break
 	cv2.destroyAllWindows()
     
