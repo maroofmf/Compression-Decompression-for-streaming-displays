@@ -24,10 +24,13 @@ class compression(segmentation):
 
     def computeIDCT(self):
 
+	# put DCT into a file
     def loadFromCMP(self):
-        # set dctCOEFF
-
+		# Uses computeDCT
+		# Uses computeLayer from segmentation class as well
+		
+	# put DCT into a file
     def saveCMP(self):
-        # put DCT into a file
+		# Uses computeIDCT and quantize
 
     def quantize(self):
