@@ -17,6 +17,7 @@ class segmentation(videoData):
     def computeMotionVector(self):
 		# Uses YfromRGB
 		
+	# Thinking about making this a private function
 	def YfromRGB(self):
 	
 	# returns a label indicating the block type
