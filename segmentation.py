@@ -10,15 +10,22 @@ Class functions:
 Notes:
 
 '''
+
+import cv2
+from videoData import videoData
+
 class segmentation(videoData):
-    #------------------------------ Constructor ------------------------------#
+#    #------------------------------ Constructor ------------------------------#
     def __init__(self):
-	
-    def computeMotionVector(self):
-		# Uses YfromRGB
-		
-	def YfromRGB(self):
-	
-	# returns a label indicating the block type
-    def computeLayer(self):
-		# Uses computeMotionVector
+        
+#	
+#    def computeMotionVector(self):
+#		# Uses YfromRGB
+#		
+    def YfromRGB(self,frame):
+        gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)        
+        return gray
+#	
+#	# returns a label indicating the block type
+#    def computeLayer(self):
+#		# Uses computeMotionVector

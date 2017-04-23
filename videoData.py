@@ -43,7 +43,7 @@ class videoData:
         a = np.empty((block_size*block_size),'uint8')
         frameOffset = frameNumber*self.__height*self.__width*self.__channels
         no_of_blocks = math.floor((self.__width/block_size))*math.floor((self.__height/block_size))
-        print no_of_blocks
+#        print no_of_blocks
         for c in range(self.__channels):
             channelOffset = self.__height*self.__width*c
             if blockNumber < no_of_blocks:
@@ -57,7 +57,7 @@ class videoData:
                 a[index*block_size:index*block_size + block_size] = b
             
             block[:,:,2-c] = np.copy(a.reshape((block_size,block_size)))
-            print block[:,:,2-c]
+#            print block[:,:,2-c]
         return block
         
         
@@ -68,8 +68,8 @@ class videoData:
         block_dimention_updated = np.einsum('jki->ijk',block3D)
         dct_file = open('DCT.cmp', 'a')
         for channel in range (self.__channels):
-             block = block_dimention_updated[:][:][channel]
-             print 'Block',block
+             block = block_dimention_updated[:][:][2-channel]
+#             print 'Block',block
              block_f = np.float32(block)  # float conversion/scale
              dct_coeffs = cv2.dct(block_f)           # the dct
              str1 = "Type "
@@ -80,7 +80,12 @@ class videoData:
                  
              dct_file.write(dct_row_str)
         dct_file.close
-#        myFile.write("\n")        
+#        myFile.write("\n")   
+        
+        
+    def YfromRGB(self,frame):
+        gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)        
+        return gray
 #class compression(videoData):
 #
 #     def __init(self):
