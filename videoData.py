@@ -12,6 +12,7 @@ Notes:
 import numpy as np
 import math
 from scipy.fftpack import dct, idct
+import cv2
 class videoData:
     
     #------------------------------ Constructor ------------------------------#
@@ -46,9 +47,9 @@ class videoData:
         for c in range(self.__channels):
             channelOffset = self.__height*self.__width*c
             if blockNumber < no_of_blocks:
-                startIndex = frameOffset + channelOffset + (math.floor((blockNumber) / (self.__width/block_size)) * (self.__width/block_size) * block_size * block_size) + ((blockNumber)%(self.__width/block_size) * block_size)
+                startIndex = frameOffset + channelOffset + (math.floor((blockNumber) / (self.__width/block_size)) * self.__width * block_size) + ((blockNumber)%(self.__width/block_size) * block_size)
             else:
-                startIndex = frameOffset + channelOffset + channelOffset - (((self.__width/block_size) - (blockNumber - no_of_blocks))* block_size*block_size)
+                startIndex = frameOffset + channelOffset + channelOffset - ((((self.__width/block_size) - (blockNumber - no_of_blocks))* block_size)+((block_size-1))*self.__width)
             for index in range(block_size):
 
                 b = self.__videoFrames[(self.__width*(index))+startIndex:(self.__width*(index))+startIndex + block_size] 
@@ -59,6 +60,27 @@ class videoData:
             print block[:,:,2-c]
         return block
         
+        
+        
+        
+    def computeDCT(self,block3D, block_size):
+#        print block3D
+        block_dimention_updated = np.einsum('jki->ijk',block3D)
+        dct_file = open('DCT.cmp', 'a')
+        for channel in range (self.__channels):
+             block = block_dimention_updated[:][:][channel]
+             print 'Block',block
+             block_f = np.float32(block)  # float conversion/scale
+             dct_coeffs = cv2.dct(block_f)           # the dct
+             str1 = "Type "
+             for i in range(block_size):
+                 str1 = str1 + str(dct_coeffs[i][0:])
+             dct_row_str = str1.replace("\n", "")
+             
+                 
+             dct_file.write(dct_row_str)
+        dct_file.close
+#        myFile.write("\n")        
 #class compression(videoData):
 #
 #     def __init(self):

@@ -22,13 +22,16 @@ class videoPlayer(videoData):
 
 def main():
 	vidPlayer = videoPlayer('oneperson_960_540.rgb',540, 960, 3)
-	frame = vidPlayer.getBlock(0,1980,16)     
+	block = vidPlayer.getBlock(0,1980,8)
+	 
+#	print 'Block 1980: ', block_dimention_updated  
+	vidPlayer.computeDCT(block,8)     
 	#for frame in vidPlayer.iterator():
-	cv2.imshow('frame',frame)
-	cv2.waitKey(0)  
-         #print 'hi'     
-#        break
-	cv2.destroyAllWindows()
+#	cv2.imshow('frame',block)
+#	cv2.waitKey(0)  
+#         #print 'hi'     
+##        break
+#	cv2.destroyAllWindows()
     
 if __name__ == '__main__':
 	main()
