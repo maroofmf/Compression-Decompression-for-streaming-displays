@@ -22,7 +22,7 @@ class videoPlayer(videoData):
 
 def main():
 	vidPlayer = videoPlayer('oneperson_960_540.rgb',540, 960, 3)
-	frame = vidPlayer.getBlock(0,20,16)     
+	frame = vidPlayer.getBlock(0,1980,16)     
 	#for frame in vidPlayer.iterator():
 	cv2.imshow('frame',frame)
 	cv2.waitKey(0)  

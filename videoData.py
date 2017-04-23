@@ -41,10 +41,14 @@ class videoData:
         block = np.empty((block_size,block_size, self.__channels),'uint8')
         a = np.empty((block_size*block_size),'uint8')
         frameOffset = frameNumber*self.__height*self.__width*self.__channels
+        no_of_blocks = math.floor((self.__width/block_size))*math.floor((self.__height/block_size))
+        print no_of_blocks
         for c in range(self.__channels):
-            channelOffset = self.__height*self.__width*c		
-            startIndex = frameOffset + channelOffset + (math.floor((blockNumber) / (self.__width/block_size)) * (self.__width/block_size) * block_size * block_size) + ((blockNumber)%(self.__width/block_size) * block_size)
-            
+            channelOffset = self.__height*self.__width*c
+            if blockNumber < no_of_blocks:
+                startIndex = frameOffset + channelOffset + (math.floor((blockNumber) / (self.__width/block_size)) * (self.__width/block_size) * block_size * block_size) + ((blockNumber)%(self.__width/block_size) * block_size)
+            else:
+                startIndex = frameOffset + channelOffset + channelOffset - (((self.__width/block_size) - (blockNumber - no_of_blocks))* block_size*block_size)
             for index in range(block_size):
 
                 b = self.__videoFrames[(self.__width*(index))+startIndex:(self.__width*(index))+startIndex + block_size] 
@@ -55,35 +59,35 @@ class videoData:
             print block[:,:,2-c]
         return block
         
-class compression(videoData):
-
-     def __init(self):
-         self.__blockSize = 8
-
-     def computeDCT(self, block3D):
-         
-         for channel in range (self.__channels):
-             block = block3D[:][:][channel]
-             block_f = np.float32(block)  # float conversion/scale
-             dct_coeffs = cv2.dct(block_f)           # the dct
-             str1 = "Type "
-             for i in range(self.__blockSize):
-                 str1 = str1 + str(dct_coeffs[i][0:])
-             dct_row_str = str1.replace("\n", "")
-             with open('DCT.cmp', 'w') as myFile:
-                 
-                 myFile.write(dct_row_str)
-         myFile.write("\n")
-         
-
-     def computeIDCT(self):
-         imgcv1 = cv2.idct(dst)
-     def loadFromCMP(self):
-         # set dctCOEFF
-
-     def saveCMP(self):
-         # put DCT into a file
-
-     def quantize(self):
-
+#class compression(videoData):
+#
+#     def __init(self):
+#         self.__blockSize = 8
+#
+#     def computeDCT(self, block3D):
+#         
+#         for channel in range (self.__channels):
+#             block = block3D[:][:][channel]
+#             block_f = np.float32(block)  # float conversion/scale
+#             dct_coeffs = cv2.dct(block_f)           # the dct
+#             str1 = "Type "
+#             for i in range(self.__blockSize):
+#                 str1 = str1 + str(dct_coeffs[i][0:])
+#             dct_row_str = str1.replace("\n", "")
+#             with open('DCT.cmp', 'w') as myFile:
+#                 
+#                 myFile.write(dct_row_str)
+#         myFile.write("\n")
+#         
+#
+#     def computeIDCT(self):
+#         imgcv1 = cv2.idct(dst)
+#     def loadFromCMP(self):
+#         # set dctCOEFF
+#
+#     def saveCMP(self):
+#         # put DCT into a file
+#
+#     def quantize(self):
+#
 
