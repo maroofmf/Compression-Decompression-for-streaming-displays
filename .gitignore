@@ -2,5 +2,6 @@
 *.rgb
 *.raw
 *.jpg
-*.JPEG
 *.png
+*.JPEG
+*.DS_Store
