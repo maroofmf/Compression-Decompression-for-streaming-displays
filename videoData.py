@@ -1,5 +1,5 @@
 '''
-Description: Read and index data.
+Description: Read and index video data.
 #----------------------------------------------------------------------------------------------------------------#
 Class functions:
 
@@ -8,38 +8,44 @@ Class functions:
 Notes:
 
 '''
+# Importing dependancies:
+
 import numpy as np
+
+#----------------------------------------------------------------------------------------------------------------#
 
 class videoData:
 
-#------------------------------ Constructor ------------------------------#
-    def __init__(self, FILE_NAME, HEIGHT, WIDTH, CHANNELS):
-        self.__videoFrames = np.fromfile(FILE_NAME, dtype ='uint8')
-        self.__width = WIDTH
-        self.__height = HEIGHT
-        self.__channels = CHANNELS
-        self.totalFrames = len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS)
+	def __init__(self, FILE_NAME, HEIGHT, WIDTH, CHANNELS):
 
-    def getFrame(self,frameNumber):
-        rgbArray = np.zeros((self.__height,self.__width,self.__channels),'uint8')
-        # i,j,k = [(frameNumber-1)*HEIGHT*WIDTH*CHANNELS + i*HEIGHT*WIDTH for i in range(3)]
+		print('\033[1;33m[Status]==> Loading video file\033[0m')
+		self.__videoFrames = np.fromfile(FILE_NAME, dtype ='uint8')
+		self.width = WIDTH
+		self.height = HEIGHT
+		self.channels = CHANNELS
+		self.totalFrames = len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS)
 
-        for channel in range(self.__channels):
-            for row in range(self.__height):
-                for col in range(self.__width):
-                    i = channel*self.__height*self.__width+row*self.__width+col
-                    rgbArray[row][col][channel] = self.__videoFrames[self.__channels*(frameNumber-1)*self.__height*self.__width + i]
-        return rgbArray
+#----------------------------------------------------------------------------------------------------------------#
+# Retrieve frame data in RGB format:
 
+	def getFrame(self,frameNumber):
 
-    def iterator(self,startFrame=0):
-        for i in range(self.totalFrames):
-            yield(self.getFrame(startFrame+i))
+		frame = np.empty((self.height,self.width, self.channels),'uint8')
+		frameOffset = frameNumber*self.height*self.width*self.channels
 
+		# Loop through all channels
+		for c in range(self.channels):
+			channelOffset = self.height*self.width*c
+			startIndex = frameOffset + channelOffset
+			endIndex =	startIndex + self.height*self.width
+			frame[:,:,c] = np.copy((self.__videoFrames[startIndex:endIndex]).reshape((self.height,self.width)))
 
-if __name__ =='__main__':
-    a = videoData('oneperson_960_540.rgb',540,960,3)
-    a.getFrame(0)
-    a.getFrame(1)
-    a.getFrame(2)
+		return frame
+
+#----------------------------------------------------------------------------------------------------------------#
+# Iterate through frames:
+
+	def iterator(self,startFrame=0):
+		for i in range(self.totalFrames):
+			yield(self.getFrame(startFrame+i))
 
