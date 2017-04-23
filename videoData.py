@@ -117,4 +117,3 @@ class videoData:
 #
 #     def quantize(self):
 #
-
