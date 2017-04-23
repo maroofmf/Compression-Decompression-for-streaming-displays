@@ -12,7 +12,7 @@ import numpy as np
 
 class videoData:
 
-    #------------------------------ Constructor ------------------------------#
+#------------------------------ Constructor ------------------------------#
     def __init__(self, FILE_NAME, HEIGHT, WIDTH, CHANNELS):
         self.__videoFrames = np.fromfile(FILE_NAME, dtype ='uint8')
         self.__width = WIDTH
@@ -36,25 +36,10 @@ class videoData:
         for i in range(self.totalFrames):
             yield(self.getFrame(startFrame+i))
 
-    # def getNextBlock:
 
-
-# class compression(videoData):
-
-#     def __init(self):
-#         self.dctCOEFF = [[],[],[],[],[].....]
-
-#     def computeDCT(self):
-#         self.getNextBlock()
-
-#     def computeIDCT(self):
-
-#     def loadFromCMP(self):
-#         # set dctCOEFF
-
-#     def saveCMP(self):
-#         # put DCT into a file
-
-#     def quantize(self):
-
+if __name__ =='__main__':
+    a = videoData('oneperson_960_540.rgb',540,960,3)
+    a.getFrame(0)
+    a.getFrame(1)
+    a.getFrame(2)
 

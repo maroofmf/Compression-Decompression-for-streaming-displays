@@ -29,9 +29,8 @@ img = ImageTk.PhotoImage(Image.open(path))
 panel = tkinter.Label(window,image = img)
 panel.pack(side = "bottom", fill = "both", expand = "yes")
 window.mainloop()
-'''
 
-'''
+
 import tkinter as tk
 import time
 
@@ -60,7 +59,6 @@ class play():
         self.window.after(500,self.refresh)
 
 a = play()
-'''
 
 import tkinter as tk
 import time
@@ -84,6 +82,7 @@ button3.pack(side = tk.LEFT)
 button4.pack(side = tk.BOTTOM)
 
 root.mainloop()
+'''
 
 
 
