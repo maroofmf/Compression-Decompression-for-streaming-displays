@@ -28,8 +28,8 @@ class videoData:
         return self.__channels
         
     def getNumBlocks(self,blockSize):
-        noOfBlocks =  math.ceil(self.__width/blockSize) * math.ceil(self.__height/blockSize)
-#        print noOfBlocks
+        noOfBlocks =  math.ceil(self.__width/blockSize) * math.ceil(1.0*self.__height/blockSize)
+        #print noOfBlocks
         return int(noOfBlocks)
         
     
