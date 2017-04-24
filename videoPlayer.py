@@ -13,7 +13,6 @@ import math
 from videoData import videoData
 from compression import compression
 #import segmentation
-import time
 import cv2
 import numpy as np
 
@@ -23,7 +22,7 @@ class videoPlayer(videoData):
 
 
 def main():
-    vidData = videoData('oneperson_960_540.rgb',540, 960, 3)
+    vidData = videoData('oneperson_960_540.rgb', 540, 960, 3)
 #	seg = segmentation()
     #frame = vidPlayer.getFrame(0)
     compressor = compression(1,1,vidData)
