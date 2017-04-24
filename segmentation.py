@@ -17,15 +17,17 @@ from videoData import videoData
 class segmentation(videoData):
 #    #------------------------------ Constructor ------------------------------#
     def __init__(self):
+        return
+#	
+    # def computeMotionVector(self):
+		# # Uses YfromRGB
         
-#	
-#    def computeMotionVector(self):
-#		# Uses YfromRGB
-#		
-    def YfromRGB(self,frame):
-        gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)        
-        return gray
-#	
-#	# returns a label indicating the block type
-#    def computeLayer(self):
-#		# Uses computeMotionVector
+# #		
+    # def YfromRGB(self,frame):
+        # gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)        
+        # return gray
+# #	
+# #	# returns a label indicating the block type
+    # def computeLayer(self):
+		# # Uses computeMotionVector
+        

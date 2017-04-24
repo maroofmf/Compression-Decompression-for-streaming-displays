@@ -11,7 +11,7 @@ Notes:
 '''
 import numpy as np
 import math
-from scipy.fftpack import dct, idct
+#from scipy.fftpack import dct, idct
 import cv2
 class videoData:
     
@@ -23,6 +23,9 @@ class videoData:
 	self.__channels = CHANNELS
 	self.totalFrames = len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS)
 	
+    def getNumChannels(self):
+        return self.__channels
+    
     def getFrame(self,frameNumber):
 		frame = np.empty((self.__height,self.__width, self.__channels),'uint8')
 		frameOffset = frameNumber*self.__height*self.__width*self.__channels
