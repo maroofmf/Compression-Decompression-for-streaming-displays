@@ -13,6 +13,7 @@ import numpy as np
 import math
 from scipy.fftpack import dct, idct
 import cv2
+
 class videoData:
     
     #------------------------------ Constructor ------------------------------#
@@ -67,17 +68,23 @@ class videoData:
 #        print block3D
         block_dimention_updated = np.einsum('jki->ijk',block3D)
         dct_file = open('DCT.cmp', 'a')
+        float_formatter = lambda x: "%.1f" % x
+        np.set_printoptions(formatter={'float_kind':float_formatter})
+        str2 = "Type "
+        dct_file.write(str2)
         for channel in range (self.__channels):
+             str1 = ""
              block = block_dimention_updated[:][:][2-channel]
 #             print 'Block',block
              block_f = np.float32(block)  # float conversion/scale
-             dct_coeffs = cv2.dct(block_f)           # the dct
-             str1 = "Type "
+             dct_coeffs = cv2.dct(block_f)           # the dct             
              for i in range(block_size):
-                 str1 = str1 + str(dct_coeffs[i][0:])
+                 str1 = str1 + str(np.around(dct_coeffs[i][0:],decimals=1)) + " "
+#                 print str1
              dct_row_str = str1.replace("\n", "")
-             
-                 
+             dct_row_str = dct_row_str.replace("[", "")
+             dct_row_str = dct_row_str.replace("]", "")
+#             print dct_row_str                 
              dct_file.write(dct_row_str)
         dct_file.close
 #        myFile.write("\n")   

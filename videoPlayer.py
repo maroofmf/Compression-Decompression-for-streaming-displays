@@ -32,11 +32,11 @@ def main():
 	#for frame in vidPlayer.iterator():
 	gray = vidPlayer.YfromRGB(frame)
 	print gray.shape 
-	cv2.imshow('frame',gray)
-	cv2.waitKey(0)  
-         #print 'hi'     
-#        break
-	cv2.destroyAllWindows()
-    
+#	cv2.imshow('frame',gray)
+#	cv2.waitKey(0)  
+#         #print 'hi'     
+##        break
+#	cv2.destroyAllWindows()
+#    
 if __name__ == '__main__':
 	main()
