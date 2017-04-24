@@ -11,7 +11,7 @@ Notes:
 '''
 import numpy as np
 import math
-from scipy.fftpack import dct, idct
+#from scipy.fftpack import dct, idct
 import cv2
 
 class videoData:
@@ -24,6 +24,15 @@ class videoData:
 	self.__channels = CHANNELS
 	self.totalFrames = len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS)
 	
+    def getNumChannels(self):
+        return self.__channels
+        
+    def getNumBlocks(self,blockSize):
+        noOfBlocks =  math.ceil(self.__width/blockSize) * math.ceil(self.__height/blockSize)
+#        print noOfBlocks
+        return int(noOfBlocks)
+        
+    
     def getFrame(self,frameNumber):
 		frame = np.empty((self.__height,self.__width, self.__channels),'uint8')
 		frameOffset = frameNumber*self.__height*self.__width*self.__channels
@@ -62,33 +71,33 @@ class videoData:
         return block
         
         
-        
-        
-    def computeDCT(self,block3D, block_size):
-#        print block3D
-        block_dimention_updated = np.einsum('jki->ijk',block3D)
-        dct_file = open('DCT.cmp', 'a')
-        float_formatter = lambda x: "%.1f" % x
-        np.set_printoptions(formatter={'float_kind':float_formatter})
-        str2 = "Type "
-        dct_file.write(str2)
-        for channel in range (self.__channels):
-             str1 = ""
-             block = block_dimention_updated[:][:][2-channel]
-#             print 'Block',block
-             block_f = np.float32(block)  # float conversion/scale
-             dct_coeffs = cv2.dct(block_f)           # the dct             
-             for i in range(block_size):
-                 str1 = str1 + str(np.around(dct_coeffs[i][0:],decimals=1)) + " "
-#                 print str1
-             dct_row_str = str1.replace("\n", "")
-             dct_row_str = dct_row_str.replace("[", "")
-             dct_row_str = dct_row_str.replace("]", "")
-#             print dct_row_str                 
-             dct_file.write(dct_row_str)
-        dct_file.close
-#        myFile.write("\n")   
-        
+#        
+#        
+#    def computeDCT(self,block3D, block_size):
+##        print block3D
+#        block_dimention_updated = np.einsum('jki->ijk',block3D)
+#        dct_file = open('DCT.cmp', 'a')
+#        float_formatter = lambda x: "%.1f" % x
+#        np.set_printoptions(formatter={'float_kind':float_formatter})
+#        str2 = "Type "
+#        dct_file.write(str2)
+#        for channel in range (self.__channels):
+#             str1 = ""
+#             block = block_dimention_updated[:][:][2-channel]
+##             print 'Block',block
+#             block_f = np.float32(block)  # float conversion/scale
+#             dct_coeffs = cv2.dct(block_f)           # the dct             
+#             for i in range(block_size):
+#                 str1 = str1 + str(np.around(dct_coeffs[i][0:],decimals=1)) + " "
+##                 print str1
+#             dct_row_str = str1.replace("\n", "")
+#             dct_row_str = dct_row_str.replace("[", "")
+#             dct_row_str = dct_row_str.replace("]", "")
+##             print dct_row_str                 
+#             dct_file.write(dct_row_str)
+#        dct_file.close
+##        myFile.write("\n")   
+#        
         
     def YfromRGB(self,frame):
         gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)        

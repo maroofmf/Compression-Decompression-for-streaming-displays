@@ -26,14 +26,19 @@ class compression():
     def computeDCT(self,block3D, block_size):
 #        print block3D
         blockType = 0 #To be computed from segmentation
-        blockDCTString = "Type " + str(blockType)
+        blockDCTString = "" + str(blockType) + " "
         block_dimention_updated = np.einsum('jki->ijk',block3D)
+        float_formatter = lambda x: "%.1f" % x
+        np.set_printoptions(formatter={'float_kind':float_formatter})
         for channel in range (self.vidData.getNumChannels()):
             block = block_dimention_updated[:][:][channel]
             block_f = np.float32(block)  # float conversion/scale
             dct_coeffs = cv2.dct(block_f)           # the dct
-            channelDCTStr = str(dct_coeffs.reshape((1, block_size*block_size)))
-            blockDCTString += channelDCTStr
+            channelDCTStr = str(np.around(dct_coeffs.reshape((1, block_size*block_size)),decimals=1))
+            blockDCTString += channelDCTStr + " "
+        blockDCTString = blockDCTString.replace("\n", "")
+        blockDCTString = blockDCTString.replace("[", "")
+        blockDCTString = blockDCTString.replace("]", "")
         return blockDCTString
 
     def computeIDCT(self):
@@ -46,9 +51,12 @@ class compression():
     def saveCMP(self):
         # put DCT into a file
         dct_file = open('DCT.cmp', 'a')
-        block = self.vidData.getBlock(0,0,8)
-        blockDCTString = self.computeDCT(block,8)     
-        dct_file.write(blockDCTString)
+        block_size = 8
+        noOfBlocks = self.vidData.getNumBlocks(block_size)
+        for i in range(noOfBlocks):
+            block = self.vidData.getBlock(0,i,block_size)
+            blockDCTString = self.computeDCT(block,block_size)     
+            dct_file.write(blockDCTString + "\n")
         dct_file.close
 
     def quantize(self):
