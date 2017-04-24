@@ -12,7 +12,7 @@ from segmentation import segmentation
 import sys
 #----------------------------------------------------------------------------------------------------------------#
 def main():
-    fileName = sys.argv[0]
+    fileName = sys.argv[1]
     height = 540
     width = 960
     channels = 3

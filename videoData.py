@@ -9,6 +9,7 @@ Class functions:
 Notes:
 
 '''
+import time
 import numpy as np
 import math
 #from scipy.fftpack import dct, idct
@@ -22,7 +23,7 @@ class videoData:
         self.__width = WIDTH
         self.__height = HEIGHT
         self.__channels = CHANNELS
-        self.totalFrames = len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS)
+        self.totalFrames = len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS)        
         self.__videoFrames = self.__videoFrames.reshape((self.totalFrames, self.__channels, self.__height, self.__width))
         
     def getNumChannels(self):
