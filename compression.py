@@ -15,6 +15,7 @@ Notes:
 '''
 import numpy as np
 import cv2
+import time
 from videoData import videoData
 class compression():
     #------------------------------ Constructor ------------------------------#
@@ -50,6 +51,7 @@ class compression():
 
     def saveCMP(self):
         # put DCT into a file
+        st = time.time()
         dct_file = open('DCT.cmp', 'a')
         block_size = 8
         noOfBlocks = self.vidData.getNumBlocks(block_size)
@@ -57,6 +59,7 @@ class compression():
             block = self.vidData.getBlock(0,i,block_size)
             blockDCTString = self.computeDCT(block,block_size)     
             dct_file.write(blockDCTString + "\n")
+        print time.time() - st
         dct_file.close
 
     def quantize(self):
