@@ -12,7 +12,7 @@ from segmentation import segmentation
 import time, sys, numpy as np
 ##----------------------------------------------------------------------------------------------------------------##
 def main():
-    fileName = sys.argv[1]
+    fileName = 'oneperson_960_540.rgb' #sys.argv[1]
     height = 540
     width = 960
     channels = 3
@@ -34,7 +34,7 @@ def main():
     #--------------- Segment from the 2nd frame and continue to compress ---------------#
     prevFrame = vidData.getFrame(0)
     prevFrame = segmentor.YfromRGB(prevFrame)
-    for frameNumber in range (1, vidData.totalFrames):
+    for frameNumber in range (1, vidData.totalFrame):
         if frameNumber%10==0:
             print 'Frame ', frameNumber
         #---------------- Segment the Nth frame in the segmentor -----------------------#
