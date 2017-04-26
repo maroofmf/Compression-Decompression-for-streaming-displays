@@ -4,4 +4,7 @@
 *.jpg
 *.png
 *.JPEG
-*.CMP
+<<<<<<< .merge_file_a04540
+*.cmp
+=======
+>>>>>>> .merge_file_a07972

@@ -10,13 +10,13 @@ Class functions:
 Notes:
 
 '''
-
 import cv2
 from videoData import videoData
 
 class segmentation(videoData):
 #    #------------------------------ Constructor ------------------------------#
     def __init__(self):
+        self.__blockSize = 16
         return
 #	
     # def computeMotionVector(self):
@@ -30,4 +30,3 @@ class segmentation(videoData):
 # #	# returns a label indicating the block type
     # def computeLayer(self):
 		# # Uses computeMotionVector
-        
