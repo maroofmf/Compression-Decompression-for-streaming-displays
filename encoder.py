@@ -12,7 +12,7 @@ from segmentation import segmentation
 import time, sys, numpy as np
 ##----------------------------------------------------------------------------------------------------------------##
 def main():
-    fileName = sys.argv[1]
+    fileName = 'oneperson_960_540.rgb' #sys.argv[1]
     height = 540
     width = 960
     channels = 3
@@ -31,10 +31,26 @@ def main():
     dct_file = open('DCT.cmp', 'a')
     compressor.saveToCMP(0, dct_file)
     
-    #--------------- Segment from the 2nd frame and continue to compress ---------------#
+    #------------------------- Segment from the 2nd frame ------------------------------#
     prevFrame = vidData.getFrame(0)
     prevFrame = segmentor.YfromRGB(prevFrame)
-    for frameNumber in range (1, vidData.totalFrames):
+    for frameNumber in range (1, vidData.totalFrame):
+        if frameNumber%10==0:
+            print 'Frame ', frameNumber
+        #---------------- Segment the Nth frame in the segmentor -----------------------#
+        currFrame = vidData.getFrame(frameNumber)
+        currFrame = segmentor.YfromRGB(currFrame)
+        segmentor.segmentBlocksInFrame(currFrame, prevFrame)
+        
+        #---------------------------- Update prevFrame ---------------------------------#
+        prevFrame = currFrame
+    #-----------------------------------------------------------------------------------#
+    
+    
+    #--------------- Compress  and continue to compress ---------------#
+    prevFrame = vidData.getFrame(0)
+    prevFrame = segmentor.YfromRGB(prevFrame)
+    for frameNumber in range (1, vidData.totalFrame):
         if frameNumber%10==0:
             print 'Frame ', frameNumber
         #---------------- Segment the Nth frame in the segmentor -----------------------#

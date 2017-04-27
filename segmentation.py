@@ -37,6 +37,7 @@ class segmentation(videoData):
         height = self.__vidData.getHeight()
         width = self.__vidData.getWidth()
         k = self.__searchWin
+        motionVectors = np.zeros((len(iIndices)*len(iIndices), 2))
         for i in iIndices:
             for j in jIndices:
                 block = frame[i:i+self.__blockSize, j:j+self.__blockSize]
@@ -44,8 +45,24 @@ class segmentation(videoData):
                 bottomRight = [min(i+k+self.__blockSize, height), min(j+k+self.__blockSize, width)]
                 searchSpace = prevFrame[topLeft[ROW]:bottomRight[ROW], topLeft[COL]:bottomRight[COL]]
                 dx, dy = computeMotionVector(searchSpace, block)
-    
+                motionVectors[i*len(jIndices) + j] = dx, dy
+                
+        
     def computeMotionVector(self, searchSpace, block):
+        rows = searchSpace.shape[0]
+        cols = searchSpace.shape[1]
+        k = self.__searchWin
+        SADvals = np.zeros((rows-self.__blockSize+1, cols-self.__blockSize+1))
+        blockTopLeft = [rows-k-self.__blockSize-1, cols-k-self.__blockSize-1]
+        for i in range(0, SADvals.shape[0]):
+            for j in range(0, SADvals.shape[1]):
+                localNeighbor = searchSpace[i:i+self.__blockSize, j:j+self.__blockSize]
+                SADvals[i][j] = np.sum(np.sum(localNeighbor*block))
+        
+        minSAD_pos = np.argmin(SADvals)
+        minSAD_TopLeft = [minSAD_pos/rows, minSAD_pos%cols]
+        dx = minSAD_TopLeft[0]-blockTopLeft[0]
+        dy = minSAD_TopLeft[1]-blockTopLeft[1]
         return dx, dy
 
     # Can't use cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY) since frame is of size (3, rows, cols)
