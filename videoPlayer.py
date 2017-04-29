@@ -14,6 +14,7 @@ Notes:
 
 from tkinter import *
 from PIL import Image, ImageTk
+import numpy as np
 import math
 import sys
 from videoData import videoData
@@ -57,12 +58,16 @@ class videoPlayer(videoData):
         self.buttonFrame = Frame(self.root)
         self.buttonFrame.pack(side=BOTTOM)
 
+        # Initlaize iteratior:
+        self.forwardIterator = self.iterator()
+
         # Initialize panels
         self.imagePanel = Label(self.imageFrame,image = self.init_img)
         self.imagePanel.pack()
         self.buttonsInit()
-        self.index = 0
+
         # Start program
+        self.currentJob = None # After function job id
         self.root.mainloop()
 
 #-----------------------------------------------------------------------------------------------#
@@ -89,6 +94,7 @@ class videoPlayer(videoData):
 
     def playVideo(self):
 
+
         if self.playing:
             self.playing = False
             self.playButton.config(image=self.playButtonImage)
@@ -106,30 +112,33 @@ class videoPlayer(videoData):
     def freezeFrame(self):
 
         if(self.playing):
+            print('[Status]: Playing the video')
+            self.root.after_cancel(self.currentJob)
+            self.currentJob = None
             return
 
-        self.img = ImageTk.PhotoImage(Image.fromarray(self.getFrame(self.index)))
+        self.img = ImageTk.PhotoImage(Image.fromarray(self.nextFrame()))
         self.imagePanel.config(image = self.img)
         self.imagePanel.pack()
 
         # Pause the video
-        self.root.after(100,self.freezeFrame)
+        self.currentJob = self.root.after(100,self.freezeFrame)
 
 #-----------------------------------------------------------------------------------------------#
 # Sync the video:
 
     def sync(self):
 
-        if not self.playing:
+        if(not self.playing):
+            print('Pausing the video')
+            self.root.after_cancel(self.currentJob)
+            self.currentJob = None
             return
 
         startTime = time.time()
-        if(self.index ==self.totalFrames):
-            sys.exit(0)
-        self.img = ImageTk.PhotoImage(Image.fromarray(self.getFrame(self.index)))
+        self.img = ImageTk.PhotoImage(Image.fromarray(next(self.forwardIterator)))
         self.imagePanel.config(image = self.img)
         self.imagePanel.pack()
-        self.index +=1
 
         # Caluculate Delay
         delay = (1.0/self.frameRate)-(time.time()-startTime)
@@ -138,7 +147,7 @@ class videoPlayer(videoData):
         assert delay>0,'\033[0;31m[AssertionError]==> Cannot run at the given frame rate\033[0m'
 
         # Synchronize the video
-        self.root.after(int(delay*1000),self.sync)
+        self.currentJob = self.root.after(int(delay*1000),self.sync)
 
 #-----------------------------------------------------------------------------------------------#
 # Boilerplate code (For testing only):
