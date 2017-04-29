@@ -31,7 +31,7 @@ class videoData:
         
     def getNumChannels(self):
         return self.__channels
-        
+    
     def getHeight(self):
         return self.__height
     
@@ -43,6 +43,9 @@ class videoData:
         #print noOfBlocks
         return int(noOfBlocks)
         
+    
+    def getLabel(self, frameNumber, i, j):
+        return self.blockLabels[frameNumber, i, j]
     
     def getFrame(self,frameNumber):
         frame = self.__videoFrames[frameNumber, :,:,:]
