@@ -14,7 +14,7 @@ import cv2
 import numpy as np
 from videoData import videoData
 import matplotlib.pyplot as plt
-SAD_Thresh = 4000
+SAD_Thresh = 5000
 ROW = 0
 COL = 1
 R_CHANNEL = 0
@@ -59,6 +59,7 @@ class segmentation(videoData):
                     else:
                         # print i,j, SADval, (dx, dy)
                         self.setLabel(frameNumber, blockCounter, 1) # Foreground
+                        # cv2.rectangle(frame, (j, i), (j + 16, i + 16), (0, 255, 0), 2)
                         # cv2.imshow('searchSpace', np.uint8(searchSpace))
                         # cv2.waitKey(0)
                 else:
@@ -69,6 +70,10 @@ class segmentation(videoData):
                     # cv2.waitKey(0)
                     # exit(0)
                 blockCounter += 1
+        # cv2.imshow('frame', np.uint8(frame))
+        # cv2.waitKey(1)
+        # cv2.imshow('frame', np.uint8(frame))
+        # cv2.waitKey(0)
         # np.savetxt('motionVectors.txt', motionVectors, fmt='%d')
         # exit(0)
         # fig = plt
