@@ -11,8 +11,9 @@ from decompression import decompression
 import time, sys, numpy as np, cv2
 ##----------------------------------------------------------------------------------------------------------------##
 def parseMetaData():
-    metaFile = open('metaFile.txt', 'r')
-    width, height, channels, totalFrames, frameRate = metaFile.read.split('\n')
+    metaFile = open('MetaData.txt', 'r')
+    metaDataStr = metaFile.read().split('\n')
+    width, height, channels, totalFrames, frameRate = map(int, metaDataStr)
     metaFile.close()
     return width, height, channels, totalFrames, frameRate
 ##----------------------------------------------------------------------------------------------------------------##
