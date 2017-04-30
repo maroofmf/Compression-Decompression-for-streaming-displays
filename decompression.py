@@ -30,7 +30,7 @@ class decompression():
                 tillFrame = no_of_frames
                 till_frame_number = no_of_frames
                 
-            f = open('D:\Spring 2017\CSCI 576\Final project\gaze_control\DCT'+str(int((file_sel+1) * tillFrame))+'.cmp')
+            f = open('DCT' + str(int((file_sel+1) * tillFrame))+'.cmp')
             cntr1 = 0    
             for line in f.read().split('\n'):
                 dctNumsStr = line.split(' ')

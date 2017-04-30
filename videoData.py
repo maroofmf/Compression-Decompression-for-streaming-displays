@@ -23,11 +23,25 @@ class videoData:
         self.__width = WIDTH
         self.__height = HEIGHT
         self.__channels = CHANNELS
+        self.__frameRate = 30
         self.totalFrames = len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS)
-        self.blockLabels = np.zeros((self.totalFrames, math.ceil(self.__height/8.0), math.ceil(self.__width/8.0)), dtype=np.int)
+        self.blockLabels = np.zeros((int(self.totalFrames), int(math.ceil(self.__height/8.0)), int(math.ceil(self.__width/8.0))), dtype=np.int)
+        self.writeMetaData()
+        
         #--- Reshape videoFrame from 1 x (540_rows x 960_cols x 3_channels x 363_frames) --------------------#
         #---------------------- to (363_frames) x (3_channels) x (540_rows) x (960_cols) --------------------#
         self.__videoFrames = self.__videoFrames.reshape((self.totalFrames, self.__channels, self.__height, self.__width))
+        
+    def writeMetaData(self):
+        metaData = str(int(self.__width))+'\n'
+        metaData += str(int(self.__height))+'\n'
+        metaData += str(int(self.__channels))+'\n'
+        metaData += str(int(self.totalFrames))+'\n'
+        metaData += str(int(self.__frameRate))
+        
+        metaFile = open('MetaData.txt','w')
+        metaFile.write(metaData)
+        metaFile.close()
         
     def getNumChannels(self):
         return self.__channels
