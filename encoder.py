@@ -19,7 +19,7 @@ def main():
     
     #------------------------------ Construct objects ----------------------------------#
     vidData = videoData(fileName, height, width, channels)
-    compressor = compression(1,1,vidData);
+    compressor = compression(vidData);
     searchWin = 16
     segmentor = segmentation(vidData, searchWin)
     #------------------------------- Set numpy format ----------------------------------#
@@ -48,19 +48,9 @@ def main():
         prevFrame = currFrame
     #-----------------------------------------------------------------------------------#
     
-    
+    compressor.saveCMP()
     #----------------- Compress all the frames using label knowledge -------------------#
-    # for frameNumber in range (1, vidData.totalFrame):
-        # if frameNumber%10==0:
-            # print 'Frame ', frameNumber
-        #--------------- Compress the Nth frame in the compressor ----------------------#
-        # compressor.saveToCMP(frameNumber, dct_file)
-        
-        #---------------------------- Update prevFrame ---------------------------------#
-        #prevFrame = currFrame
-    #-----------------------------------------------------------------------------------#
-    # dct_file.close
-    # print time.time()-time1
+    
 ##----------------------------------------------------------------------------------------------------------------##
 if __name__ == '__main__':
     main()

@@ -20,22 +20,21 @@ import time
 from videoData import videoData
 class compression():
     #------------------------------ Constructor ------------------------------#
-    def __init__(self, n1, n2, vidData):
-        self.__quantStepFG = n1
-        self.__quantStepBG = n2
-        self.__vidData = vidData
+    def __init__(self, vidData):
+        self.vidData = vidData
         self.__blockSize = 8
 
-    def computeDCT(self, block3D, block_size):
+    def computeDCT(self, block3D, block_size, blockType):
 #        print block3D
-        blockType = 0.0 #To be computed from segmentation
+        # blockType = 0.0 #To be computed from segmentation
+        
 #        blockDCTString = "" + str(blockType) + " "
-        float_formatter = lambda x: "%.1f" % x
-        np.set_printoptions(formatter={'float_kind':float_formatter})
+        # float_formatter = lambda x: "%.1f" % x
+        # np.set_printoptions(formatter={'float_kind':float_formatter})
         channelDCT = np.zeros(block_size*block_size*3 + 1)
         # block_dimention_updated = np.einsum('jki->ijk',block3D)
         channelDCT[0] = blockType
-        for channel in range (self.__vidData.getNumChannels()):
+        for channel in range (self.vidData.getNumChannels()):
             block = block3D[channel, :, :]
             block_f = np.float32(block)  # float conversion/scale
             dct_coeffs = cv2.dct(block_f)           # the dct
@@ -45,15 +44,50 @@ class compression():
 #        blockDCTString = blockDCTString.replace("[", "")
 #        blockDCTString = blockDCTString.replace("]", "")
         return channelDCT
+        
+    # def computeIDCT(self,dequantised_coef):
+        # rgb_frames = np.zeros(self.vidData.totalFrames,3,self.vidData.getWidth(),self.vidData.getHeight())
+        # iIndices = range(0, self.vidData.getHeight(), 8)
+        # jIndices = range(0, self.vidData.getWidth(), 8)
+        # iIndices[-1] = self.vidData.getHeight() - self.__blockSize
+        # jIndices[-1] = self.vidData.getWidth() - self.__blockSize
+        
+        # for frame in range(self.vidData.totalFrames):
+            # cntr = 0
+            # for i in iIndices:
+                # for j in jIndices:
+                    # for channel in range (self.vidData.getNumChannels()):
+                        # rgb_frames[frame,channel,i:i+8,j:j+8] = cv2.idct((dequantised_coef[self.vidData.getNumBlocks*frame+cntr,(channel*64)+1:((channel+1)*64)+1].reshape(8,8)))
+                    # cntr = cntr + 1
+                
+        # return
 
-    def computeIDCT(self):
-        return
+    # def loadFromCMP(self):
+        # cntr = 0
+        # cntr2=0
+        # no_of_frames = 10
+        # Dct_array = np.zeros((self.vidData.getNumBlocks(8)*self.vidData.totalFrames,193))
+        # for file_sel in range(int(math.floor(self.vidData.totalFrames/no_of_frames))):
+            # f = open('C:/Users/aggar/Desktop/gaze_control/DCT'+str((file_sel+1) * no_of_frames)+'.cmp')
+            # cntr1 = 0    
+            # for y in f.read().split('\n'):   
+                # x = []
+                # cntr = 0
+                # for z in y.split(' '):
+            # #            print z
+                    # if cntr == 193:
+                        # break
+                    # x.append(float(z))
+                    # cntr = cntr + 1
+                # Dct_array[cntr2,:] = x
+                # cntr1 = cntr1 + 1
+                # cntr2 = cntr2 + 1
+                # if cntr1 == self.vidData.getNumBlocks(8)*no_of_frames:
+                    # break
+        # return Dct_array
+        # # set dctCOEFF
 
-    def loadFromCMP(self):
-        return
-        # set dctCOEFF
-
-    def saveToCMP(self, frameNumber, dct_file):
+    def saveCMP(self):
         # put DCT into a file
         st = time.time()
 #        dct_file = open('DCT.cmp', 'a')
@@ -61,24 +95,33 @@ class compression():
 #        np.set_printoptions(formatter={'float_kind':float_formatter})
         
         # noOfBlocks = self.vidData.getNumBlocks(block_size)
-#        self.vidData.totalFrames = 1
-        iIndices = range(0, self.__vidData.getHeight(), self.__blockSize)
-        jIndices = range(0, self.__vidData.getWidth(), self.__blockSize)
+#        self.vidData.totalFrames = 50
+        iIndices = range(0, self.vidData.getHeight(), self.__blockSize)
+        jIndices = range(0, self.vidData.getWidth(), self.__blockSize)
         no_of_blocks = len(iIndices)*len(jIndices)
-        #print no_of_blocks
-        blockDCT = np.zeros((self.__vidData.totalFrames*no_of_blocks,(self.__blockSize*self.__blockSize*self.__vidData.getNumChannels())+ 1))
+        # print no_of_blocks
+        blockDCT = np.zeros((10*no_of_blocks,(8*8*3 )+ 1))
         
-        iIndices[-1] = self.__vidData.getHeight() - self.__blockSize
-        jIndices[-1] = self.__vidData.getWidth() - self.__blockSize
+        iIndices[-1] = self.vidData.getHeight() - self.__blockSize
+        jIndices[-1] = self.vidData.getWidth() - self.__blockSize
 #        self.vidData.totalFrames
         cntr = 0
-        for frame in range(self.__vidData.totalFrames):
+        cntr_frame = 0
+        for frame in range(self.vidData.totalFrames):
             for i in iIndices:
                 for j in jIndices:
-                    block = self.__vidData.getBlock(frame, i, j, self.__blockSize)
-                    blockDCT[cntr,:] = self.computeDCT(block, self.__blockSize)
+                    blockType = self.vidData.getLabel(cntr_frame, i/8, j/8)
+                    block = self.vidData.getBlock(frame, i, j, self.__blockSize)
+                    
+                    blockDCT[cntr,:] = self.computeDCT(block, self.__blockSize, blockType)
 #                    print blockDCT[cntr,:]
                     cntr = cntr + 1
+            cntr_frame = cntr_frame + 1
+            if cntr_frame % 10 == 0:
+                np.savetxt('DCT'+str(cntr_frame) + '.cmp', blockDCT, fmt='%1.1f')
+                cntr = 0
+                print time.time() - st
+                        
     #                print blockDCTString
     #                dct_file.write(blockDCTString)
             
@@ -93,9 +136,17 @@ class compression():
 #            blockDCTString = blockDCTString.replace("]", "")
 #            dct_file.write (blockDCTString)
 #            dct_file.write('\n')
-        np.savetxt('DCT.cmp', blockDCT, fmt='%1.1f')
+#        np.savetxt('DCT.cmp', blockDCT, fmt='%1.1f')
 #        dct_file.close
         print time.time() - st
 
-    def quantize(self):
-        return
+    # def quantize(self):
+        # DCT_matrix = loadFromCMP()
+        # n1 = 2
+        # n2 = 3    
+        # for i in range(self.vidData.getNumBlocks(8)*self.vidData.totalFrames):
+            # if (DCT_matrix[i,0] == 0.0):
+                # DCT_matrix[i,1:] = [int(a / n1)*n1 for a in DCT_matrix[i,1:]]
+            # else:
+                # DCT_matrix[i,1:] = [int(a / n2)*n2 for a in DCT_matrix[i,1:]]
+        # return DCT_matrix
