@@ -31,6 +31,15 @@ playerInitPath = './metadata/playerInit.jpg'
 global pauseButtonPath
 pauseButtonPath = './metadata/pauseButton.jpg'
 
+global stopButtonPath
+stopButtonPath = './metadata/stopButton.jpg'
+
+global gazeOnButtonPath
+gazeOnButtonPath = './metadata/gazeOn.jpg'
+
+global gazeOffButtonPath
+gazeOffButtonPath = './metadata/gazeOff.jpg'
+
 #----------------------------------------------------------------------------------------------------------------#
 class videoPlayer(videoData):
 
@@ -49,8 +58,14 @@ class videoPlayer(videoData):
         self.frameRate = FRAMERATE
         self.playButtonImage = ImageTk.PhotoImage(Image.open(playButtonPath).resize((40,40),1))
         self.pauseButtonImage = ImageTk.PhotoImage(Image.open(pauseButtonPath).resize((40,40),1))
+        self.stopButtonImage = ImageTk.PhotoImage(Image.open(stopButtonPath).resize((40,40),1))
+        self.gazeOnButtonImage = ImageTk.PhotoImage(Image.open(gazeOnButtonPath).resize((40,40),1))
+        self.gazeOffButtonImage = ImageTk.PhotoImage(Image.open(gazeOffButtonPath).resize((40,40),1))
         self.init_img = ImageTk.PhotoImage(Image.open(playerInitPath).resize((960,540)))
+
+        # Initialize state of player:
         self.playing = False
+        self.gazeControl = False
 
         # Init frames
         self.imageFrame = Frame(self.root)
@@ -67,8 +82,10 @@ class videoPlayer(videoData):
         self.buttonsInit()
 
         # Start program
-        self.currentJob = None # After function job id
-        self.root.mainloop()
+        self.playJob = None # Play job_id
+        self.freezeJob = None # Freeze job_id
+        print('\033[1;33m[Status]:Player initialized\033[0m')
+        self.root.mainloop() # Main loop for GUI
 
 #-----------------------------------------------------------------------------------------------#
 # Initialize buttons:
@@ -79,28 +96,69 @@ class videoPlayer(videoData):
         self.playButton = Button(self.buttonFrame,image=self.playButtonImage, command = self.playVideo)
         self.playButton.pack(side=LEFT)
 
-        '''
         # Stop button:
-        stopButton = Button(self.buttonFrame,text = 'stop',command = self.stopVideo)
-        stopButton.pack(side =LEFT)
+        self.stopButton = Button(self.buttonFrame,image=self.stopButtonImage, command = self.stopVideo)
+        self.stopButton.pack(side =LEFT)
 
         # Gaze control button
-        gazeButton = Button(self.buttonFrame,text = 'Gaze_control',command = self.action)
-        gazeButton.pack(side = LEFT)
-        '''
+        self.gazeButton = Button(self.buttonFrame,image =self.gazeOffButtonImage ,command = self.gazeToggle)
+        self.gazeButton.pack(side = LEFT)
+
+
+#-----------------------------------------------------------------------------------------------#
+# Toggle gaze control:
+
+    def gazeToggle(self):
+
+        if(self.gazeControl):
+            print('\033[0;32m[Status]:Disable Gaze Control\033[0m')
+            self.gazeControl = False
+            self.gazeButton.config(image=self.gazeOffButtonImage)
+            self.gazeButton.pack()
+        else:
+            print('\033[0;32m[Status]:Enable Gaze Control\033[0m')
+            self.gazeControl = True
+            self.gazeButton.config(image=self.gazeOnButtonImage)
+            self.gazeButton.pack()
+
+#-----------------------------------------------------------------------------------------------#
+# Stop button callback function:
+
+    def stopVideo(self):
+
+        # Stop and reset video display:
+        print('\033[0;32m[Status]:Stopping the video\033[0m')
+        if(self.freezeJob):
+            self.root.after_cancel(self.freezeJob)
+            self.freezeJob = None
+
+        if(self.playJob):
+            self.root.after_cancel(self.playJob)
+            self.playJob = None
+
+        # Change button of the pause player;
+        self.playing = False
+        self.playButton.config(image=self.playButtonImage)
+        self.playButton.pack()
+
+        # Refresh the player:
+        self.imagePanel.config(image = self.init_img)
+        self.imagePanel.pack()
+        self.iteratorIndex = 0
 
 #-----------------------------------------------------------------------------------------------#
 # Play/Pause button callback function:
 
     def playVideo(self):
 
-
         if self.playing:
+            print('\033[0;32m[Status]:Pausing the video\033[0m')
             self.playing = False
             self.playButton.config(image=self.playButtonImage)
             self.playButton.pack()
             self.freezeFrame()
         else:
+            print('\033[0;32m[Status]:Playing the video\033[0m')
             self.playing=True
             self.playButton.config(image=self.pauseButtonImage)
             self.playButton.pack()
@@ -112,30 +170,32 @@ class videoPlayer(videoData):
     def freezeFrame(self):
 
         if(self.playing):
-            print('[Status]: Playing the video')
-            self.root.after_cancel(self.currentJob)
-            self.currentJob = None
+            self.root.after_cancel(self.freezeJob)
+            self.freezeJob = None
             return
 
-        self.img = ImageTk.PhotoImage(Image.fromarray(self.nextFrame()))
+        self.img = ImageTk.PhotoImage(Image.fromarray(self.currentFrame()))
         self.imagePanel.config(image = self.img)
         self.imagePanel.pack()
 
         # Pause the video
-        self.currentJob = self.root.after(100,self.freezeFrame)
+        self.freezeJob = self.root.after(100,self.freezeFrame)
 
 #-----------------------------------------------------------------------------------------------#
 # Sync the video:
 
     def sync(self):
 
+        # Calculate function time for sync
+        startTime = time.time()
+
+        # Check player status:
         if(not self.playing):
-            print('Pausing the video')
-            self.root.after_cancel(self.currentJob)
-            self.currentJob = None
+            self.root.after_cancel(self.playJob)
+            self.playJob = None
             return
 
-        startTime = time.time()
+        # Update image and pack:
         self.img = ImageTk.PhotoImage(Image.fromarray(next(self.forwardIterator)))
         self.imagePanel.config(image = self.img)
         self.imagePanel.pack()
@@ -147,7 +207,7 @@ class videoPlayer(videoData):
         assert delay>0,'\033[0;31m[AssertionError]==> Cannot run at the given frame rate\033[0m'
 
         # Synchronize the video
-        self.currentJob = self.root.after(int(delay*1000),self.sync)
+        self.playJob = self.root.after(int(delay*1000),self.sync)
 
 #-----------------------------------------------------------------------------------------------#
 # Boilerplate code (For testing only):
