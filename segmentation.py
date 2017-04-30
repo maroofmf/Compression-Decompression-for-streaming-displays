@@ -40,7 +40,7 @@ class segmentation(videoData):
         height = self.__vidData.getHeight()
         width = self.__vidData.getWidth()
         k = self.__searchWin
-        motionVectors = np.zeros((len(iIndices)*len(jIndices), 2))
+        # motionVectors = np.zeros((len(iIndices)*len(jIndices), 2))
         blockCounter = 0
         for i in iIndices:
             for j in jIndices:
@@ -64,7 +64,7 @@ class segmentation(videoData):
                         # cv2.waitKey(0)
                 else:
                     self.setLabel(frameNumber, blockCounter, 0) # Backgrounds because of low SAD at the center
-                motionVectors[blockCounter] = dx, dy
+                # motionVectors[blockCounter] = dx, dy
                 # if i == 336 and j==192:
                     # cv2.imshow('searchSpace', np.uint8(searchSpace))
                     # cv2.waitKey(0)
@@ -104,7 +104,7 @@ class segmentation(videoData):
         minSAD_pos = np.where(SADvals == SADvals.min())
         minSAD_TopLeft = [minSAD_pos[ROW].tolist()[0], minSAD_pos[COL].tolist()[0]]
         # print 'blockTopLeft', blockTopLeft, '\t minSAD_TopLeft', minSAD_TopLeft, 'minSAD_pos', minSAD_pos
-        np.savetxt('SADvals.txt', SADvals, fmt='%d')
+        # np.savetxt('SADvals.txt', SADvals, fmt='%d')
         dx = minSAD_TopLeft[0]-blockTopLeft[0]
         dy = minSAD_TopLeft[1]-blockTopLeft[1]
         return dx, dy
