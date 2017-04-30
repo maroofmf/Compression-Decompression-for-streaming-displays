@@ -43,7 +43,7 @@ class decompression():
             if frameCount==self.totalFrames:
                 break
             print 'Loaded', str(int((file_sel+1) * tillFrame))+'.cmp in ', time.time() - startTime, 'sec'
-            return Dct_array
+        return Dct_array
         
     def quantize(self, Dct_array):
         self.totalFrames = self.totalFrames

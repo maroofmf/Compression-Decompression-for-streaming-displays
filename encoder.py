@@ -22,16 +22,16 @@ def main():
     compressor = compression(vidData);
     searchWin = 16
     segmentor = segmentation(vidData, searchWin)
+    #-----------------------------------------------------------------------------------#
+    
     #------------------------------- Set numpy format ----------------------------------#
     float_formatter = lambda x: "%.1f" % x
     np.set_printoptions(formatter={'float_kind':float_formatter})
-    
-    #---------------------- Compress the I frame (1st frame) ---------------------------#
-    # time1 = time.time()
-    # dct_file = open('DCT.cmp', 'a')
-    # compressor.saveToCMP(0, dct_file)
+    startTime = time.time()
+    #-----------------------------------------------------------------------------------#
     
     #------------------------- Segment from the 2nd frame ------------------------------#
+    print 'Starting segmentation: '
     prevFrame = vidData.getFrame(0)
     prevFrame = segmentor.YfromRGB(prevFrame)
     for frameNumber in range (1, vidData.totalFrames):
@@ -40,17 +40,22 @@ def main():
         currFrame = segmentor.YfromRGB(currFrame)
         # cv2.imshow('frame', np.uint8(currFrame))
         # cv2.waitKey(0)
-        st = time.time()
         segmentor.segmentBlocksInFrame(currFrame, prevFrame, frameNumber)
-        print 'Frame ', frameNumber, time.time() - st, 'sec'
+        if frameNumber%10 == 0 or frameNumber==vidData.totalFrames-1:
+            print 'Total frames segmented', frameNumber
         # print vidData.getLabel(frameNumber, 336/8, 192/8)
         #---------------------------- Update prevFrame ---------------------------------#
         prevFrame = currFrame
     #-----------------------------------------------------------------------------------#
     
-    compressor.saveCMP()
     #----------------- Compress all the frames using label knowledge -------------------#
+    print 'Time to segment all frames', time.time()-startTime, 'sec\n\n'
     
+    print 'Starting compression: '
+    startTime = time.time()
+    compressor.saveCMP()
+    print 'Time to segment all frames', time.time()-startTime, 'sec\n\n'
+    #-----------------------------------------------------------------------------------#
 ##----------------------------------------------------------------------------------------------------------------##
 if __name__ == '__main__':
     main()

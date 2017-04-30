@@ -19,12 +19,13 @@ def main():
     width = 960
     channels = 3
     frameRate = 30
-    totalFrames = 30
+    totalFrames = 363
     #------------------------------ Construct objects ----------------------------------#
     #vidPlayer = videoData(fileName, height, width, channels, frameRate)
     decompressor = decompression(n1, n2, totalFrames);
     
     #------------------------------- Read all the frames -------------------------------#
+    
     DCTVid = decompressor.loadFromCMP()
     quantizedDCTVid = decompressor.quantize(DCTVid)
     rgbVid = decompressor.computeIDCT(quantizedDCTVid)
