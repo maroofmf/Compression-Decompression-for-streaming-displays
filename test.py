@@ -1,17 +1,7 @@
-l = [1,2,3,4]
-
-def next1(other):
-    return next(other)
-
-def me():
-    i=0
-    while(True):
-        yield(l[i])
-        i+=1
-
-it = me()
-print(next1(it))
-print(next1(it))
-print(next1(it))
-print(next1(it))
-
+import tkinter as Tkinter
+root = Tkinter.Tk(  )
+for r in range(3):
+        for c in range(4):
+                    Tkinter.Label(root, text='R%s/C%s'%(r,c),
+                                        borderwidth=1 ).grid(row=r,column=c)
+                    root.mainloop(  )

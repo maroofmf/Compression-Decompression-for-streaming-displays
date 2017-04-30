@@ -19,6 +19,7 @@ import math
 import sys
 from videoData import videoData
 import time
+import os
 
 #----------------------------------------------------------------------------------------------------------------#
 # FilePaths:
@@ -66,7 +67,7 @@ class videoPlayer(videoData):
         # Initialize state of player:
         self.playing = False
         self.gazeControl = False
-
+        self.mouseCoordinates = [None,None]
         # Init frames
         self.imageFrame = Frame(self.root)
         self.imageFrame.pack()
@@ -80,12 +81,23 @@ class videoPlayer(videoData):
         self.imagePanel = Label(self.imageFrame,image = self.init_img)
         self.imagePanel.pack()
         self.buttonsInit()
+        self.mouseStatusInit()
 
         # Start program
         self.playJob = None # Play job_id
         self.freezeJob = None # Freeze job_id
-        print('\033[1;33m[Status]:Player initialized\033[0m')
+        print('\033[1;33m[Status]:Player initialized with PID:%d\033[0m'%(os.getpid()))
+        self.root.bind('<Motion>',self.motion) # Update mouse activities
         self.root.mainloop() # Main loop for GUI
+
+#-----------------------------------------------------------------------------------------------#
+# Initialize mouse status:
+
+    def mouseStatusInit(self):
+
+        # Set Text Bar:
+        self.mouseStatusDisplay = Label(self.buttonFrame,text='Coords: %d,%d'%(0,0))
+        self.mouseStatusDisplay.pack(side = LEFT)
 
 #-----------------------------------------------------------------------------------------------#
 # Initialize buttons:
@@ -104,6 +116,28 @@ class videoPlayer(videoData):
         self.gazeButton = Button(self.buttonFrame,image =self.gazeOffButtonImage ,command = self.gazeToggle)
         self.gazeButton.pack(side = LEFT)
 
+
+#-----------------------------------------------------------------------------------------------#
+# Update mouse:
+
+    def motion(self,event):
+
+        # Set mouse coordinates:
+        self.mouseCoordinates[0] = event.x
+        self.mouseCoordinates[1] = event.y
+
+        # Filter mouse pointers:
+        if(self.mouseCoordinates[0]<0 or self.mouseCoordinates[0]>960):
+            self.mouseCoordinates[0] = None
+            self.mouseCoordinates[1] = None
+
+
+        if(self.mouseCoordinates[1]<0 or self.mouseCoordinates[1]>540):
+            self.mouseCoordinates[0] = None
+            self.mouseCoordinates[1] = None
+
+        # Update display
+        self.mouseStatusDisplay.config(text='Coords: %d,%d'%( self.mouseCoordinates[0], self.mouseCoordinates[1]))
 
 #-----------------------------------------------------------------------------------------------#
 # Toggle gaze control:
