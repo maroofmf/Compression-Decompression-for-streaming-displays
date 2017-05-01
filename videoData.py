@@ -29,7 +29,8 @@ class videoData:
 		self.blockLabels = np.zeros((int(self.totalFrames),int(math.ceil(self.height/8.0)),int(math.ceil(self.width/8.0))))
 		#--- Reshape videoFrame from 1 x (540_rows x 960_cols x 3_channels x 363_frames) --------------------#
 		#---------------------- to (363_frames) x (3_channels) x (540_rows) x (960_cols) --------------------#
-		self.videoFrames = self.videoFrames.reshape((int(self.totalFrames), int(self.channels), int(self.height), int(self.width)))
+		self.videoFrames = self.videoFrames.reshape((int(self.totalFrames), int(self.channels),int(self.height), int(self.width)))
+		self.videoFrames = self.videoFrames.transpose(0,2,3,1)
 
 #----------------------------------------------------------------------------------------------------------------#
 # Metadata:
@@ -86,8 +87,7 @@ class videoData:
 		return frame
 
 	def getBlock(self, frameNumber, i, j, block_size):
-		block3D = self.videoFrames[frameNumber, :, i:i+block_size, j:j+block_size]
-		return block3D
+		return self.videoFrames[frameNumber, :, i:i+block_size, j:j+block_size]
 
 #----------------------------------------------------------------------------------------------------------------#
 # Get current Frame:

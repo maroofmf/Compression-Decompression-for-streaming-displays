@@ -208,7 +208,9 @@ class videoPlayer(videoData):
             self.freezeJob = None
             return
 
-        self.img = ImageTk.PhotoImage(Image.fromarray(np.reshape(self.currentFrame(),(self.height,self.width))))
+
+
+        self.img = ImageTk.PhotoImage(Image.fromarray(self.currentFrame()))
         self.imagePanel.config(image = self.img)
         self.imagePanel.pack()
 
@@ -220,8 +222,6 @@ class videoPlayer(videoData):
 
     def sync(self):
 
-        # Calculate function time for sync
-        startTime = time.time()
 
         # Check player status:
         if(not self.playing):
@@ -229,8 +229,11 @@ class videoPlayer(videoData):
             self.playJob = None
             return
 
+        # Calculate function time for sync
+        startTime = time.time()
+
         # Update image and pack:
-        self.img = ImageTk.PhotoImage(Image.fromarray(np.reshape(next(self.forwardIterator),(self.height,self.width))))
+        self.img = ImageTk.PhotoImage(Image.fromarray((next(self.forwardIterator))))
         self.imagePanel.config(image = self.img)
         self.imagePanel.pack()
 
