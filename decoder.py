@@ -11,6 +11,13 @@ from decompression import decompression
 import time, sys, numpy as np, cv2
 import os
 ##----------------------------------------------------------------------------------------------------------------##
+def parseMetaData():
+    metaFile = open('MetaData.txt', 'r')
+    metaDataStr = metaFile.read().split('\n')
+    width, height, channels, totalFrames, frameRate = map(int, metaDataStr)
+    metaFile.close()
+    return width, height, channels, totalFrames, frameRate
+##----------------------------------------------------------------------------------------------------------------##
 def main():
 
     print('PID: %d',os.getpid())
@@ -18,12 +25,13 @@ def main():
     n1 = int(sys.argv[1])
     n2 = int(sys.argv[2])
     gazeControl = int(sys.argv[3])
+    width, height, channels, totalFrames, frameRate = parseMetaData()
 
-    height = 540
-    width = 960
-    channels = 3
-    frameRate = 30
-    totalFrames = 363
+    # height = 540
+    # width = 960
+    # channels = 3
+    # frameRate = 30
+    # totalFrames = 363
     #------------------------------ Construct objects ----------------------------------#
     #vidPlayer = videoData(fileName, height, width, channels, frameRate)
     decompressor = decompression(n1, n2, totalFrames);
