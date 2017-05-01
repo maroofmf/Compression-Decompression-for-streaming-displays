@@ -34,17 +34,17 @@ class compression():
             dct_coeffs = cv2.dct(block_f)           # the dct
             channelDCT[(block_size*block_size*channel)+1:(block_size*block_size*(channel+1))+1] = np.around(dct_coeffs.reshape((1, block_size*block_size)),1)
         return channelDCT
-        
+
     def saveCMP(self):
         # put DCT into a file
         # st = time.time()
-        iIndices = range(0, self.vidData.getHeight(), self.__blockSize)
-        jIndices = range(0, self.vidData.getWidth(), self.__blockSize)
+        iIndices = list(range(0, self.vidData.getHeight(), self.__blockSize))
+        jIndices = list(range(0, self.vidData.getWidth(), self.__blockSize))
         no_of_blocks = len(iIndices)*len(jIndices)
 #        print no_of_blocks
-        framesPerCMP = 10
+        framesPerCMP = 50
         blockDCT = np.zeros((framesPerCMP*no_of_blocks,(8*8*3 )+ 1))
-        
+
         iIndices[-1] = self.vidData.getHeight() - self.__blockSize
         jIndices[-1] = self.vidData.getWidth() - self.__blockSize
 #        self.vidData.totalFrames
@@ -61,4 +61,4 @@ class compression():
             if cntr_frame % framesPerCMP == 0 or cntr_frame==self.vidData.totalFrames:
                 np.savetxt('DCT'+str(cntr_frame) + '.cmp', blockDCT[0:cntr,:], fmt='%1.1f')
                 cntr = 0
-                print 'Wrote', 'DCT'+str(cntr_frame) + '.cmp' 
+                print('Wrote', 'DCT'+str(cntr_frame) + '.cmp')

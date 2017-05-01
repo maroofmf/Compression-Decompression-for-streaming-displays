@@ -1,5 +1,5 @@
 '''
-Description: Segmentation class. 
+Description: Segmentation class.
 -> Obtains 16x16 blocks of the raw video and computes motion vectors.
 -> videoData class used to inherit block accessor
 #----------------------------------------------------------------------------------------------------------------#
@@ -13,7 +13,7 @@ Notes:
 import cv2
 import numpy as np
 from videoData import videoData
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 SAD_Thresh = 5000
 ROW = 0
 COL = 1
@@ -26,17 +26,17 @@ class segmentation(videoData):
         self.__blockSize = 16
         self.__vidData = vidData
         self.__searchWin = k
-    
+
     def segmentBlocksInFrame(self, frame, prevFrame, frameNumber):
         #------------- Indices to traverse in the rows and cols ---------------#
-        iIndices = range(0, self.__vidData.getHeight(), self.__blockSize)
-        jIndices = range(0, self.__vidData.getWidth(), self.__blockSize)
-        
-        #------ Handle the boundary cases by overlapping blocks, i.e.,---------# 
+        iIndices = list(range(0, self.__vidData.getHeight(), self.__blockSize))
+        jIndices = list(range(0, self.__vidData.getWidth(), self.__blockSize))
+
+        #------ Handle the boundary cases by overlapping blocks, i.e.,---------#
         #---------shifting the last index to up/left appropriately-------------#
         iIndices[-1] = self.__vidData.getHeight() - self.__blockSize
         jIndices[-1] = self.__vidData.getWidth() - self.__blockSize
-        
+
         height = self.__vidData.getHeight()
         width = self.__vidData.getWidth()
         k = self.__searchWin
@@ -51,7 +51,7 @@ class segmentation(videoData):
                 searchSpace = prevFrame[topLeft[ROW]:bottomRight[ROW]+1, topLeft[COL]:bottomRight[COL]+1] # +1 so that bottomRight is included too
                 SADval, bgBlock = self.SAD_Check(searchSpace, block, [i-topLeft[ROW], j-topLeft[COL]])
                 dx, dy = [0, 0]
-                
+
                 if bgBlock == False:
                     dx, dy = self.computeMotionVectorPyramid(searchSpace, block, [i-topLeft[ROW], j-topLeft[COL]])
                     if dx == 0 and dy == 0:
@@ -80,7 +80,7 @@ class segmentation(videoData):
         # fig.plot(motionVectors[:,0], motionVectors[:,1], 'b*')
         # fig.grid()
         # fig.show()
-        
+
     def SAD_Check(self, searchSpace, block, blockTopLeft):
         i = blockTopLeft[ROW]
         j = blockTopLeft[COL]
@@ -91,7 +91,7 @@ class segmentation(videoData):
             return SADval, True
         else:
             return SADval, False
-            
+
     def computeMotionVector(self, searchSpace, block, blockTopLeft):
         rows = searchSpace.shape[0]
         cols = searchSpace.shape[1]
@@ -108,15 +108,15 @@ class segmentation(videoData):
         dx = minSAD_TopLeft[0]-blockTopLeft[0]
         dy = minSAD_TopLeft[1]-blockTopLeft[1]
         return dx, dy
-     
+
     def computeMotionVectorPyramid(self, searchSpace, block, blockTopLeft):
-        
+
         # -----------Level 3------------ #
         blockLevel3 = block[0:-1:4, 0:-1:4]
         searchSpaceLevel3 = searchSpace[0:-1:4, 0:-1:4]
         blockTopLeftLevel3 = [blockTopLeft[ROW]/4, blockTopLeft[COL]/4]
         dxLevel3, dyLevel3 = self.computeMotionVector(searchSpaceLevel3, blockLevel3, blockTopLeftLevel3)
-        
+
         # -----------Level 2------------ #
         dxLevel2, dyLevel2 = dxLevel3*2, dyLevel3*2
         searchSpaceLevel2 = searchSpace[0:-1:2, 0:-1:2]
@@ -125,12 +125,12 @@ class segmentation(videoData):
         blockTopLeftLevel2 = [blockTopLeft[ROW]/2, blockTopLeft[COL]/2]
         refinedSearchSpaceTopLeft = [max(blockTopLeftLevel2[ROW]-1, 0), max(blockTopLeftLevel2[COL]-1, 0)]
         refinedSearchSpaceBotRight = [blockTopLeftLevel2[ROW]+n, blockTopLeftLevel2[COL]+n]
-        refinedSearchSpace = searchSpaceLevel2[refinedSearchSpaceTopLeft[ROW]:refinedSearchSpaceBotRight[ROW]+1, refinedSearchSpaceTopLeft[COL]:refinedSearchSpaceBotRight[COL]+1]
+        refinedSearchSpace = searchSpaceLevel2[int(refinedSearchSpaceTopLeft[ROW]):int(refinedSearchSpaceBotRight[ROW]+1), int(refinedSearchSpaceTopLeft[COL]):int(refinedSearchSpaceBotRight[COL]+1)]
         refinedBlockTopLeft = [blockTopLeftLevel2[ROW]-refinedSearchSpaceTopLeft[ROW], blockTopLeftLevel2[COL]-refinedSearchSpaceTopLeft[COL]]
         dxRefined, dyRefined = self.computeMotionVector(refinedSearchSpace, blockLevel2, refinedBlockTopLeft)
         dxLevel2 += dxRefined
         dyLevel2 += dyRefined
-        
+
         # -----------Level 1------------ #
         dxLevel1, dyLevel1 = dxLevel2*2, dyLevel2*2
         k = self.__searchWin
@@ -142,7 +142,7 @@ class segmentation(videoData):
         dxRefined, dyRefined = self.computeMotionVector(refinedSearchSpace, block, refinedBlockTopLeft)
         dx = dxLevel1+dxRefined
         dy = dxLevel1+dyRefined
-        
+
         return dx, dy
 
     # Can't use cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY) since frame is of size (3, rows, cols)
@@ -154,8 +154,9 @@ class segmentation(videoData):
         return np.int16(gray)
 
     def setLabel(self, frameNumber, blockCounter, label):
-        r = blockCounter/60
-        c = blockCounter%60
+        r = int(blockCounter/60)
+        c = int(blockCounter%60)
+        frameNumber = int(frameNumber)
         # print blockCounter, r, c
         self.__vidData.blockLabels[frameNumber][2*r][2*c] = label
         self.__vidData.blockLabels[frameNumber][2*r][2*c+1] = label

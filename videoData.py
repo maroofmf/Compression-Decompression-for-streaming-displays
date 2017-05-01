@@ -16,43 +16,43 @@ import math
 import cv2
 import time
 class videoData:
-    
+
     #------------------------------ Constructor ------------------------------#
     def __init__(self, FILE_NAME, HEIGHT, WIDTH, CHANNELS):
         self.__videoFrames = np.fromfile(FILE_NAME, dtype ='uint8')
-        self.__width = WIDTH
-        self.__height = HEIGHT
-        self.__channels = CHANNELS
-        self.totalFrames = len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS)
-        self.blockLabels = np.zeros((self.totalFrames, math.ceil(self.__height/8.0), math.ceil(self.__width/8.0)), dtype=np.int)
+        self.__width = int(WIDTH)
+        self.__height = int(HEIGHT)
+        self.__channels = int(CHANNELS)
+        self.totalFrames = int(len(self.__videoFrames)/(WIDTH*HEIGHT*CHANNELS))
+        self.blockLabels = np.zeros((int(self.totalFrames),int(math.ceil(self.__height/8.0)),int(math.ceil(self.__width/8.0))))
         #--- Reshape videoFrame from 1 x (540_rows x 960_cols x 3_channels x 363_frames) --------------------#
         #---------------------- to (363_frames) x (3_channels) x (540_rows) x (960_cols) --------------------#
-        self.__videoFrames = self.__videoFrames.reshape((self.totalFrames, self.__channels, self.__height, self.__width))
-        
+        self.__videoFrames = self.__videoFrames.reshape((int(self.totalFrames), int(self.__channels), int(self.__height), int(self.__width)))
+
     def getNumChannels(self):
         return self.__channels
-    
+
     def getHeight(self):
         return self.__height
-    
+
     def getWidth(self):
         return self.__width
-        
+
     def getNumBlocks(self,blockSize):
         noOfBlocks =  math.ceil(1.0*self.__width/blockSize) * math.ceil(1.0*self.__height/blockSize)
         #print noOfBlocks
         return int(noOfBlocks)
-        
-    
+
+
     def getLabel(self, frameNumber, i, j):
-        return self.blockLabels[frameNumber, i, j]
-    
+        return self.blockLabels[int(frameNumber), int(i), int(j)]
+
     def getFrame(self,frameNumber):
         frame = self.__videoFrames[frameNumber, :,:,:]
 		# frame = np.empty((self.__height,self.__width, self.__channels),'uint8')
 		# frameOffset = frameNumber*self.__height*self.__width*self.__channels
 		# for c in range(self.__channels):
-			# channelOffset = self.__height*self.__width*c		
+			# channelOffset = self.__height*self.__width*c
 			# startIndex = frameOffset + channelOffset
 			# endIndex =  startIndex + self.__height*self.__width
 			# frame[:,:,2-c] = np.copy((self.__videoFrames[startIndex:endIndex]).reshape((self.__height,self.__width)))
@@ -78,10 +78,10 @@ class videoData:
                 # startIndex = frameOffset + channelOffset + channelOffset - ((((self.__width/block_size) - (blockNumber - no_of_blocks))* block_size)+((block_size-1))*self.__width)
             # for index in range(block_size):
 
-                # b = self.__videoFrames[(self.__width*(index))+startIndex:(self.__width*(index))+startIndex + block_size] 
-             
+                # b = self.__videoFrames[(self.__width*(index))+startIndex:(self.__width*(index))+startIndex + block_size]
+
                 # a[index*block_size:index*block_size + block_size] = b
-            
+
             # block[:,:,2-c] = np.copy(a.reshape((block_size,block_size)))
 #            print block[:,:,2-c]
         return block3D
