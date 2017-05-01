@@ -42,7 +42,7 @@ class compression():
         jIndices = range(0, self.vidData.getWidth(), self.__blockSize)
         no_of_blocks = len(iIndices)*len(jIndices)
 #        print no_of_blocks
-        framesPerCMP = 10
+        framesPerCMP = 50
         blockDCT = np.zeros((framesPerCMP*no_of_blocks,(8*8*3 )+ 1))
         
         iIndices[-1] = self.vidData.getHeight() - self.__blockSize

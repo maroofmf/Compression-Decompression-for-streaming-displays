@@ -12,7 +12,7 @@ from segmentation import segmentation
 import time, sys, numpy as np, cv2
 ##----------------------------------------------------------------------------------------------------------------##
 def main():
-    fileName = sys.argv[1]
+    fileName = 'oneperson_960_540.rgb'
     height = 540
     width = 960
     channels = 3
