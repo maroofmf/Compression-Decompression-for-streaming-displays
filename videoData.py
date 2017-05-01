@@ -20,6 +20,7 @@ class videoData:
 	def __init__(self, FILE_NAME, HEIGHT, WIDTH, CHANNELS):
 
 		print('\033[1;33m[Status]==> Loading video file\033[0m')
+		self.fileName = FILE_NAME
 		self.videoFrames = np.fromfile(FILE_NAME, dtype ='uint8')
 		self.width = WIDTH
 		self.height = HEIGHT
@@ -29,8 +30,8 @@ class videoData:
 		self.blockLabels = np.zeros((int(self.totalFrames),int(math.ceil(self.height/8.0)),int(math.ceil(self.width/8.0))))
 		#--- Reshape videoFrame from 1 x (540_rows x 960_cols x 3_channels x 363_frames) --------------------#
 		#---------------------- to (363_frames) x (3_channels) x (540_rows) x (960_cols) --------------------#
-		self.videoFrames = self.videoFrames.reshape((int(self.totalFrames), int(self.channels),int(self.height), int(self.width)))
-		self.videoFrames = self.videoFrames.transpose(0,2,3,1)
+		#self.videoFrames = self.videoFrames.reshape((int(self.totalFrames), int(self.channels),int(self.height), int(self.width)))
+		#self.videoFrames = self.videoFrames.transpose(0,2,3,1)
 
 #----------------------------------------------------------------------------------------------------------------#
 # Metadata:
@@ -69,21 +70,29 @@ class videoData:
 
 		# Check frameNumbers:
 		if(self.iteratorIndex <0):
-				self.iteratorIndex = self.totalFrames -1
-				frameNumber = self.iteratorIndex
+			self.iteratorIndex = self.totalFrames -1
+			frameNumber = self.iteratorIndex
 
 		if(self.iteratorIndex >= self.totalFrames):
-				self.iteratorIndex = 0
-				frameNumber = 0
+			self.iteratorIndex = 0
+			frameNumber = 0
 
 		if(frameNumber >= self.totalFrames):
-				frameNumber = self.totalFrames - 1
+			frameNumber = self.totalFrames - 1
 
 		if(frameNumber < 0):
-				frameNumber = 0
+			frameNumber = 0
 
-		# Retrive frame
-		frame = self.videoFrames[frameNumber, :,:,:]
+		# Pre allocate frame memory
+		frame = np.empty((self.height,self.width, self.channels),'uint8')
+		frameOffset = frameNumber*self.height*self.width*self.channels
+
+		# Loop through all channels
+		for c in range(self.channels):
+			channelOffset = self.height*self.width*c
+			startIndex = frameOffset + channelOffset
+			endIndex =	startIndex + self.height*self.width
+			frame[:,:,c] = np.copy((self.videoFrames[startIndex:endIndex]).reshape((self.height,self.width)))
 		return frame
 
 	def getBlock(self, frameNumber, i, j, block_size):

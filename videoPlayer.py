@@ -42,13 +42,16 @@ global gazeOffButtonPath
 gazeOffButtonPath = './metadata/gazeOff.jpg'
 
 #----------------------------------------------------------------------------------------------------------------#
-class videoPlayer(videoData):
+class videoPlayer():
 
     # Constructor: Initialize GUI
-    def __init__(self,FILENAME,HEIGHT,WIDTH,CHANNELS,FRAMERATE = 30):
+    def __init__(self,FILENAME,HEIGHT,WIDTH,CHANNELS,FRAMERATE = 30,videoFile=None):
 
-        # Super Init:
-        videoData.__init__(self,FILENAME,HEIGHT,WIDTH,CHANNELS)
+        # Initialize videoData:
+        if(videoFile):
+            self.videoData = videoFile
+        else:
+            self.videoData = videoData(self,FILENAME,HEIGHT,WIDTH,CHANNELS)
 
         # Init root
         self.root = Tk()
@@ -75,7 +78,7 @@ class videoPlayer(videoData):
         self.buttonFrame.pack(side=BOTTOM)
 
         # Initlaize iteratior:
-        self.forwardIterator = self.iterator()
+        self.forwardIterator = self.videoData.iterator()
 
         # Initialize panels
         self.imagePanel = Label(self.imageFrame,image = self.init_img)
@@ -89,6 +92,13 @@ class videoPlayer(videoData):
         print('\033[1;33m[Status]:Player initialized with PID:%d\033[0m'%(os.getpid()))
         #self.root.bind('<Motion>',self.motion) # Update mouse activities
         self.root.mainloop() # Main loop for GUI
+
+#-----------------------------------------------------------------------------------------------#
+# Initialize from videoData instance:
+
+    @classmethod
+    def fromVideoFile(cls,dataInstance,FRAMERATE=30):
+        return cls(dataInstance.fileName,dataInstance.height,dataInstance.width,dataInstance.channels,FRAMERATE,dataInstance)
 
 #-----------------------------------------------------------------------------------------------#
 # Initialize mouse status:
@@ -178,7 +188,7 @@ class videoPlayer(videoData):
         # Refresh the player:
         self.imagePanel.config(image = self.init_img)
         self.imagePanel.pack()
-        self.iteratorIndex = 0
+        self.videoData.iteratorIndex = 0
 
 #-----------------------------------------------------------------------------------------------#
 # Play/Pause button callback function:
@@ -208,9 +218,7 @@ class videoPlayer(videoData):
             self.freezeJob = None
             return
 
-
-
-        self.img = ImageTk.PhotoImage(Image.fromarray(self.currentFrame()))
+        self.img = ImageTk.PhotoImage(Image.fromarray(self.videoData.currentFrame()))
         self.imagePanel.config(image = self.img)
         self.imagePanel.pack()
 
@@ -221,7 +229,6 @@ class videoPlayer(videoData):
 # Sync the video:
 
     def sync(self):
-
 
         # Check player status:
         if(not self.playing):
@@ -250,4 +257,6 @@ class videoPlayer(videoData):
 # Boilerplate code (For testing only):
 
 if __name__ == '__main__':
-	a = videoPlayer('oneperson_960_540.rgb',540,960,3,30)
+    #a = videoPlayer('oneperson_960_540.rgb',540,960,3,30)
+    a = videoData('oneperson_960_540.rgb',540,960,3)
+    b = videoPlayer.fromVideoFile(a)
