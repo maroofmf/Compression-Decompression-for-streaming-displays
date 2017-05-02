@@ -43,7 +43,7 @@ def main():
         img[:,:,2-i] = np.uint8(rgbVid[3, i,:,:])
     cv2.imshow('img', img)
     cv2.waitKey(0)
-    videoFrames = np.empty(totalFrames*channels*height*width)
+    videoFrames = np.empty(totalFrames*channels*height*width,'uint8')
     videoFrames = rgbVid.reshape((totalFrames*channels*height*width))
 #    print videoFrames.shape
 ##----------------------------------------------------------------------------------------------------------------##
