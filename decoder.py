@@ -19,7 +19,7 @@ def parseMetaData():
 ##----------------------------------------------------------------------------------------------------------------##
 def main():
 
-    n1 = 10#int(sys.argv[1])
+    n1 = 1#int(sys.argv[1])
     n2 = 100#int(sys.argv[2])
     gazeControl = 0#int(sys.argv[3])
     width, height, channels, totalFrames, frameRate = parseMetaData()
@@ -40,9 +40,12 @@ def main():
     rgbVid = decompressor.computeIDCT(quantizedDCTVid)
     img = np.zeros((height, width, channels), dtype = np.uint8)
     for i in range(channels):
-        img[:,:,2-i] = np.uint8(rgbVid[100, i,:,:])
+        img[:,:,2-i] = np.uint8(rgbVid[3, i,:,:])
     cv2.imshow('img', img)
     cv2.waitKey(0)
+    videoFrames = np.empty(totalFrames*channels*height*width)
+    videoFrames = rgbVid.reshape((totalFrames*channels*height*width))
+#    print videoFrames.shape
 ##----------------------------------------------------------------------------------------------------------------##
 if __name__ == '__main__':
     main()

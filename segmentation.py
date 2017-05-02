@@ -14,7 +14,7 @@ import cv2
 import numpy as np
 from videoData import videoData
 import matplotlib.pyplot as plt
-SAD_Thresh = 5000
+SAD_Thresh = 6000
 ROW = 0
 COL = 1
 R_CHANNEL = 0
@@ -28,6 +28,9 @@ class segmentation(videoData):
         self.__searchWin = k
     
     def segmentBlocksInFrame(self, frame, prevFrame, frameNumber):
+        shiftdx = 0
+        shiftdy = 0
+        prevFrame[4:-5,4:-5] = prevFrame[4-shiftdx: -5-shiftdx , 4-shiftdy: -5-shiftdy]
         #------------- Indices to traverse in the rows and cols ---------------#
         iIndices = range(0, self.__vidData.getHeight(), self.__blockSize)
         jIndices = range(0, self.__vidData.getWidth(), self.__blockSize)
@@ -59,7 +62,7 @@ class segmentation(videoData):
                     else:
                         # print i,j, SADval, (dx, dy)
                         self.setLabel(frameNumber, blockCounter, 1) # Foreground
-                        # cv2.rectangle(frame, (j, i), (j + 16, i + 16), (0, 255, 0), 2)
+#                        cv2.rectangle(frame, (j, i), (j + 16, i + 16), (0, 255, 0), 2)
                         # cv2.imshow('searchSpace', np.uint8(searchSpace))
                         # cv2.waitKey(0)
                 else:
@@ -70,8 +73,10 @@ class segmentation(videoData):
                     # cv2.waitKey(0)
                     # exit(0)
                 blockCounter += 1
-        # cv2.imshow('frame', np.uint8(frame))
-        # cv2.waitKey(1)
+#        cv2.imshow('frame', np.uint8(frame))
+#        cv2.waitKey(1)
+#        if cv2.waitKey(1) & 0xFF == ord('h'):        
+#            cv2.destroyAllWindows()
         # cv2.imshow('frame', np.uint8(frame))
         # cv2.waitKey(0)
         # np.savetxt('motionVectors.txt', motionVectors, fmt='%d')
@@ -152,6 +157,17 @@ class segmentation(videoData):
         gray = np.empty((frame.shape[1], frame.shape[2]), dtype = 'uint8')
         gray = 0.299*frame[R_CHANNEL, :, :] + 0.587*frame[G_CHANNEL, :, :] + 0.114*frame[B_CHANNEL, :, :]
         return np.int16(gray)
+        
+    def SfromRGB(self,frame):
+        hsv = np.empty((frame.shape[1], frame.shape[2], frame.shape[0]), dtype = 'uint8')
+#        print frame.shape
+        hsv[:,:,2] = frame[0,:,:]
+        hsv[:,:,1] = frame[1,:,:]
+        hsv[:,:,0] = frame[2,:,:]
+#        hue = np.empty((hsv.shape[0], hsv.shape[1],hsv.shape[2]), dtype = 'uint8')
+        saturation = cv2.cvtColor(hsv, cv2.COLOR_BGR2HSV)[:,:,1]
+        
+        return np.int16(saturation)
 
     def setLabel(self, frameNumber, blockCounter, label):
         r = blockCounter/60

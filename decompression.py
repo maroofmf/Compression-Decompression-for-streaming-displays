@@ -76,6 +76,7 @@ class decompression():
         iIndices[-1] = 540 - 8
         jIndices[-1] = 960 - 8
         
+        print 'Performing IDCT....'
         for frame in range(self.totalFrames):
             block_cntr = 0
             for i in iIndices:
