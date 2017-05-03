@@ -41,23 +41,21 @@ def main():
 
     #------------------------------- Read all the frames -------------------------------#
 
-    DCTVid = decompressor.loadFromCMP()
+    DCTVid = decompressor.loadFromCMP() # [DCT BLOCKS, DCT COEFFICIENTS]
     startTime = time.time()
     quantizedDCTVid = decompressor.quantize(DCTVid)
     print('Total deq time: ',time.time()-startTime)
     startTime = time.time()
-    rgbVid = decompressor.computeIDCT(quantizedDCTVid)
+    rgbVid = decompressor.computeIDCT(quantizedDCTVid).astype(np.uint8)
     print('total decompress time:',time.time()-startTime)
 
-    # reshape videoFrames:
-    videoFrames = np.empty(totalFrames*channels*height*width,dtype=np.uint8)
-    videoFrames = rgbVid.reshape((totalFrames*channels*height*width))
-
-    #np.savetxt('videoArray.txt',videoFrames,fmt='%f')
-
     #Init a videoData:
-    dataInstance = videoData.fromArray(videoFrames,height,width,channels)
-    player = videoPlayer.fromVideoFile(dataInstance,30)
+    dataInstance = videoData.fromArray(rgbVid,height,width,channels)
+    print(rgbVid.dtype)
+    print(np.shape(rgbVid))
+
+    #dataInstance.dctValues = DCTVid
+    player = videoPlayer.fromVideoFile(dataInstance,20)
 
 
 ##----------------------------------------------------------------------------------------------------------------##

@@ -84,9 +84,9 @@ class videoPlayer():
         self.imagePanel.pack()
         self.buttonsInit()
         self.mouseStatusInit()
-        self.currentBlock_i = None
-        self.currentBlock_j = None
-        self.currentBlock = None
+        self.currentBlock_i = -1
+        self.currentBlock_j = -1
+        self.currentBlock = -1
 
         # Start program
         self.playJob = None # Play job_id
@@ -154,6 +154,8 @@ class videoPlayer():
             self.currentBlock_i = self.mouseCoordinates[0]-self.mouseCoordinates[0]%8
             self.currentBlock_j = self.mouseCoordinates[1]-self.mouseCoordinates[1]%8
             self.currentBlock = (self.currentBlock_i//8)+(self.currentBlock_j//8)*(self.videoData.width//8)
+
+
 
         # Update display
         self.mouseStatusDisplay.config(text='Coords: %d,%d,%d'%( self.currentBlock_i, self.currentBlock_j,self.currentBlock))
@@ -227,9 +229,17 @@ class videoPlayer():
             self.freezeJob = None
             return
 
-        self.img = ImageTk.PhotoImage(Image.fromarray(self.videoData.currentFrame()))
+        # Gaze control:
+        if(self.gazeControl):
+            self.videoData.setBlock(self.videoData.iteratorIndex,self.currentBlock_j,self.currentBlock_i,64)
+
+        self.img = ImageTk.PhotoImage(Image.fromarray(np.transpose(self.videoData.currentFrame(),(1,2,0))))
         self.imagePanel.config(image = self.img)
         self.imagePanel.pack()
+
+        # Repatch
+        if(self.gazeControl):
+            self.videoData.repatch(self.videoData.iteratorIndex,self.currentBlock_j,self.currentBlock_i,64)
 
         # Pause the video
         self.freezeJob = self.root.after(100,self.freezeFrame)
@@ -250,10 +260,18 @@ class videoPlayer():
             self.playJob = None
             return
 
+        # Gaze control:
+        if(self.gazeControl):
+            self.videoData.setBlock(self.videoData.iteratorIndex+1,self.currentBlock_j,self.currentBlock_i,64)
+
         # Update image and pack:
-        self.img = ImageTk.PhotoImage(Image.fromarray((next(self.forwardIterator))))
+        self.img = ImageTk.PhotoImage(Image.fromarray(np.transpose(next(self.forwardIterator),(1,2,0))))
         self.imagePanel.config(image = self.img)
         self.imagePanel.pack()
+
+        # Repatch
+        if(self.gazeControl):
+            self.videoData.repatch(self.videoData.iteratorIndex,self.currentBlock_j,self.currentBlock_i,64)
 
         # Caluculate Delay
         delay = (1.0/self.frameRate)-(time.time()-startTime)

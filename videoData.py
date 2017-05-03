@@ -25,6 +25,7 @@ class videoData:
 		self.width = WIDTH
 		self.height = HEIGHT
 		self.channels = CHANNELS
+		self.patch = 0
 
 		# Load from file if FILE_NAME is mentioned
 		if(self.fileName):
@@ -32,11 +33,13 @@ class videoData:
 			self.totalFrames = int(len(self.videoFrames)/(WIDTH*HEIGHT*CHANNELS))
 			self.blockLabels = np.zeros((int(self.totalFrames),int(math.ceil(self.height/8.0)),int(math.ceil(self.width/8.0))))
 			self.videoFrames = self.videoFrames.reshape((self.totalFrames, self.channels, self.height, self.width))
-			self.videoFrames = np.transpose(self.videoFrames,(0,2,3,1))
+			#self.videoFrames = np.transpose(self.videoFrames,(0,2,3,1))
+
 		else:
 			self.videoFrames = None
 			self.totalFrames = None
 			self.blockLabels = None
+			self.videoFrames_orig = None
 
 #----------------------------------------------------------------------------------------------------------------#
 # create instance from array:
@@ -45,9 +48,9 @@ class videoData:
 	def fromArray(cls,videoArray,HEIGHT,WIDTH,CHANNELS):
 		instance = cls(None,HEIGHT,WIDTH,CHANNELS)
 		instance.videoFrames = videoArray
-		instance.totalFrames = len(videoArray)/(WIDTH*HEIGHT*CHANNELS)
+		instance.videoFrames_orig = videoArray.copy()
+		instance.totalFrames = np.size(videoArray)/(WIDTH*HEIGHT*CHANNELS)
 		instance.blockLabels = np.zeros((int(instance.totalFrames),int(math.ceil(HEIGHT/8.0)),int(math.ceil(WIDTH/8.0))))
-
 		return instance
 
 #----------------------------------------------------------------------------------------------------------------#
@@ -137,6 +140,29 @@ class videoData:
 		return self.videoFrames[frameNumber, :, i:i+block_size, j:j+block_size]
 
 #----------------------------------------------------------------------------------------------------------------#
+# Set values in current Frame:
+
+	def setBlock(self,frameNumber,i,j,block_size):
+
+		# Perform checks:
+		if(frameNumber>=self.totalFrames):
+			frameNumber =0
+
+		self.patch = self.getBlock(frameNumber,i,j,block_size).copy()
+		self.videoFrames[frameNumber,:,i:i+block_size,j:j+block_size] = 0
+
+#----------------------------------------------------------------------------------------------------------------#
+# Repatch:
+
+	def repatch(self,frameNumber,i,j,block_size):
+
+		# Perform checks:
+		if(frameNumber>=self.totalFrames):
+			frameNumber =0
+
+		self.videoFrames[frameNumber,:,i:i+block_size,j:j+block_size] = self.patch
+
+#----------------------------------------------------------------------------------------------------------------#
 # Get current Frame:
 
 	def currentFrame(self):
@@ -173,5 +199,5 @@ if __name__ =='__main__':
 	print('Started')
 	a = videoData('oneperson_960_540.rgb',540,960,3)
 	b = videoData.fromArray(a.videoFrames,540,960,3)
-	print(np.shape(a.videoFrames))
+	print(np.shape(np.transpose(a.currentFrame(),(1,2,0))))
 
