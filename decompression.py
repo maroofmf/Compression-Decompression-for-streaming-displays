@@ -72,6 +72,7 @@ class decompression():
         rgbBlock = np.zeros((3,8,8))
         for channel in range (3):
             rgb_frames[channel,:,:] = np.clip(cv2.idct(dct_coef[channel,:,:]),0,255)
+        return rgbBlock
     
     def computeIDCT_Vid(self,dequantised_coef):
         st = time.time()
