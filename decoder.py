@@ -50,14 +50,14 @@ def main():
     print('total decompress time:',time.time()-startTime)
 
     # reshape videoFrames:
-    videoFrames = np.empty(totalFrames*channels*height*width)
+    videoFrames = np.empty(totalFrames*channels*height*width,dtype=np.uint8)
     videoFrames = rgbVid.reshape((totalFrames*channels*height*width))
 
-    np.savetxt('videoArray.txt',videoFrames,fmt='%c')
+    #np.savetxt('videoArray.txt',videoFrames,fmt='%f')
 
     #Init a videoData:
     dataInstance = videoData.fromArray(videoFrames,height,width,channels)
-    player = videoPlayer.fromVideoFile(dataInstance,5)
+    player = videoPlayer.fromVideoFile(dataInstance,30)
 
 
 ##----------------------------------------------------------------------------------------------------------------##

@@ -233,6 +233,8 @@ class videoPlayer():
         # Calculate function time for sync
         startTime = time.time()
 
+        self.root.update_idletasks()
+
         # Check player status:
         if(not self.playing):
             self.root.after_cancel(self.playJob)
@@ -246,13 +248,14 @@ class videoPlayer():
 
         # Caluculate Delay
         delay = (1.0/self.frameRate)-(time.time()-startTime)
-        print(delay)
 
+        #print(delay)
         # Assert to ensure positive delay:
         assert delay>0,'\033[0;31m[AssertionError]==> Cannot run at the given frame rate\033[0m'
 
         # Synchronize the video
-        self.playJob = self.root.after(int(math.ceil(delay*1000)),self.sync)
+        #self.playJob = self.root.after(int(math.ceil(delay*1000)),self.sync)
+        self.playJob = self.root.after(int(delay*1000),self.sync)
 
 #-----------------------------------------------------------------------------------------------#
 # Boilerplate code (For testing only):
@@ -260,4 +263,4 @@ class videoPlayer():
 if __name__ == '__main__':
     #a = videoPlayer('oneperson_960_540.rgb',540,960,3,30)
     a = videoData('oneperson_960_540.rgb',540,960,3)
-    b = videoPlayer.fromVideoFile(a,60)
+    b = videoPlayer.fromVideoFile(a,30)
