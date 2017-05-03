@@ -21,17 +21,32 @@ class videoData:
 
 		print('\033[1;33m[Status]==> Loading video file\033[0m')
 		self.fileName = FILE_NAME
-		self.videoFrames = np.fromfile(FILE_NAME, dtype ='uint8')
+		self.iteratorIndex = 0
 		self.width = WIDTH
 		self.height = HEIGHT
 		self.channels = CHANNELS
-		self.totalFrames = len(self.videoFrames)/(WIDTH*HEIGHT*CHANNELS)
-		self.iteratorIndex = 0
-		self.blockLabels = np.zeros((int(self.totalFrames),int(math.ceil(self.height/8.0)),int(math.ceil(self.width/8.0))))
-		#--- Reshape videoFrame from 1 x (540_rows x 960_cols x 3_channels x 363_frames) --------------------#
-		#---------------------- to (363_frames) x (3_channels) x (540_rows) x (960_cols) --------------------#
-		#self.videoFrames = self.videoFrames.reshape((int(self.totalFrames), int(self.channels),int(self.height), int(self.width)))
-		#self.videoFrames = self.videoFrames.transpose(0,2,3,1)
+
+		# Load from file if FILE_NAME is mentioned
+		if(self.fileName):
+			self.videoFrames = np.fromfile(FILE_NAME, dtype ='uint8')
+			self.totalFrames = len(self.videoFrames)/(WIDTH*HEIGHT*CHANNELS)
+			self.blockLabels = np.zeros((int(self.totalFrames),int(math.ceil(self.height/8.0)),int(math.ceil(self.width/8.0))))
+		else:
+			self.videoFrames = None
+			self.totalFrames = None
+			self.blockLabels = None
+
+#----------------------------------------------------------------------------------------------------------------#
+# create instance from array:
+
+	@classmethod
+	def fromArray(cls,videoArray,HEIGHT,WIDTH,CHANNELS):
+		instance = cls(None,HEIGHT,WIDTH,CHANNELS)
+		instance.videoFrames = videoArray
+		instance.totalFrames = len(videoArray)/(WIDTH*HEIGHT*CHANNELS)
+		instance.blockLabels = np.zeros((int(instance.totalFrames),int(math.ceil(HEIGHT/8.0)),int(math.ceil(WIDTH/8.0))))
+
+		return instance
 
 #----------------------------------------------------------------------------------------------------------------#
 # Metadata:
@@ -134,5 +149,6 @@ class videoData:
 if __name__ =='__main__':
 	print('Started')
 	a = videoData('oneperson_960_540.rgb',540,960,3)
-	arr = a.nextFrame()
-	print(np.shape(arr))
+	b = videoData.fromArray(a.videoFrames,540,960,3)
+	print(np.shape(a.videoFrames))
+

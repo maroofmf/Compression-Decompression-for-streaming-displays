@@ -7,9 +7,12 @@ Notes:
 
 ##----------------------------------------------------------------------------------------------------------------##
 from videoPlayer import videoPlayer
+from videoData import videoData
 from decompression import decompression
 import time, sys, numpy as np, cv2
 import os
+from tempfile import TemporaryFile
+
 ##----------------------------------------------------------------------------------------------------------------##
 def parseMetaData():
     metaFile = open('MetaData.txt', 'r')
@@ -45,6 +48,17 @@ def main():
     startTime = time.time()
     rgbVid = decompressor.computeIDCT(quantizedDCTVid)
     print('total decompress time:',time.time()-startTime)
+
+    # reshape videoFrames:
+    videoFrames = np.empty(totalFrames*channels*height*width)
+    videoFrames = rgbVid.reshape((totalFrames*channels*height*width))
+
+    np.savetxt('videoArray.txt',videoFrames,fmt='%c')
+
+    #Init a videoData:
+    dataInstance = videoData.fromArray(videoFrames,height,width,channels)
+    player = videoPlayer.fromVideoFile(dataInstance,5)
+
 
 ##----------------------------------------------------------------------------------------------------------------##
 if __name__ == '__main__':

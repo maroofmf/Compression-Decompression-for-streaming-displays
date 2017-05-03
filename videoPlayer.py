@@ -1,4 +1,3 @@
-
 '''
 Description: Read and index data.
 #----------------------------------------------------------------------------------------------------------------#
@@ -90,6 +89,7 @@ class videoPlayer():
         self.playJob = None # Play job_id
         self.freezeJob = None # Freeze job_id
         print('\033[1;33m[Status]:Player initialized with PID:%d\033[0m'%(os.getpid()))
+        print('\033[1;33m[Status]:Details: Width: %d, Height: %d, FrameRate: %d\033[0m'%(self.videoData.width,self.videoData.height,self.frameRate))
         #self.root.bind('<Motion>',self.motion) # Update mouse activities
         self.root.mainloop() # Main loop for GUI
 
@@ -230,14 +230,14 @@ class videoPlayer():
 
     def sync(self):
 
+        # Calculate function time for sync
+        startTime = time.time()
+
         # Check player status:
         if(not self.playing):
             self.root.after_cancel(self.playJob)
             self.playJob = None
             return
-
-        # Calculate function time for sync
-        startTime = time.time()
 
         # Update image and pack:
         self.img = ImageTk.PhotoImage(Image.fromarray((next(self.forwardIterator))))
@@ -246,12 +246,13 @@ class videoPlayer():
 
         # Caluculate Delay
         delay = (1.0/self.frameRate)-(time.time()-startTime)
+        print(delay)
 
         # Assert to ensure positive delay:
         assert delay>0,'\033[0;31m[AssertionError]==> Cannot run at the given frame rate\033[0m'
 
         # Synchronize the video
-        self.playJob = self.root.after(int(delay*1000),self.sync)
+        self.playJob = self.root.after(int(math.ceil(delay*1000)),self.sync)
 
 #-----------------------------------------------------------------------------------------------#
 # Boilerplate code (For testing only):
@@ -259,4 +260,4 @@ class videoPlayer():
 if __name__ == '__main__':
     #a = videoPlayer('oneperson_960_540.rgb',540,960,3,30)
     a = videoData('oneperson_960_540.rgb',540,960,3)
-    b = videoPlayer.fromVideoFile(a)
+    b = videoPlayer.fromVideoFile(a,60)
