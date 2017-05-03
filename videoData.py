@@ -29,8 +29,10 @@ class videoData:
 		# Load from file if FILE_NAME is mentioned
 		if(self.fileName):
 			self.videoFrames = np.fromfile(FILE_NAME, dtype ='uint8')
-			self.totalFrames = len(self.videoFrames)/(WIDTH*HEIGHT*CHANNELS)
+			self.totalFrames = int(len(self.videoFrames)/(WIDTH*HEIGHT*CHANNELS))
 			self.blockLabels = np.zeros((int(self.totalFrames),int(math.ceil(self.height/8.0)),int(math.ceil(self.width/8.0))))
+			self.videoFrames = self.videoFrames.reshape((self.totalFrames, self.channels, self.height, self.width))
+			self.videoFrames = np.transpose(self.videoFrames,(0,2,3,1))
 		else:
 			self.videoFrames = None
 			self.totalFrames = None
@@ -81,6 +83,7 @@ class videoData:
 	def getLabel(self, frameNumber, i, j):
 		return self.blockLabels[int(frameNumber), int(i), int(j)]
 
+		'''
 	def getFrame(self,frameNumber):
 
 		# Check frameNumbers:
@@ -109,6 +112,26 @@ class videoData:
 			endIndex =	startIndex + self.height*self.width
 			frame[:,:,c] = np.copy((self.videoFrames[startIndex:endIndex]).reshape((self.height,self.width)))
 		return frame
+		'''
+
+	def getFrame(self,frameNumber):
+
+		# Check frameNumbers:
+		if(self.iteratorIndex <0):
+			self.iteratorIndex = self.totalFrames -1
+			frameNumber = self.iteratorIndex
+
+		if(self.iteratorIndex >= self.totalFrames):
+			self.iteratorIndex = 0
+			frameNumber = 0
+
+		if(frameNumber >= self.totalFrames):
+			frameNumber = self.totalFrames - 1
+
+		if(frameNumber < 0):
+			frameNumber = 0
+
+		return self.videoFrames[frameNumber, :,:,:]
 
 	def getBlock(self, frameNumber, i, j, block_size):
 		return self.videoFrames[frameNumber, :, i:i+block_size, j:j+block_size]

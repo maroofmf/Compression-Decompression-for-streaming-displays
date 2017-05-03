@@ -84,13 +84,16 @@ class videoPlayer():
         self.imagePanel.pack()
         self.buttonsInit()
         self.mouseStatusInit()
+        self.currentBlock_i = None
+        self.currentBlock_j = None
+        self.currentBlock = None
 
         # Start program
         self.playJob = None # Play job_id
         self.freezeJob = None # Freeze job_id
         print('\033[1;33m[Status]:Player initialized with PID:%d\033[0m'%(os.getpid()))
         print('\033[1;33m[Status]:Details: Width: %d, Height: %d, FrameRate: %d\033[0m'%(self.videoData.width,self.videoData.height,self.frameRate))
-        #self.root.bind('<Motion>',self.motion) # Update mouse activities
+        self.root.bind('<Motion>',self.motion) # Update mouse activities
         self.root.mainloop() # Main loop for GUI
 
 #-----------------------------------------------------------------------------------------------#
@@ -138,16 +141,22 @@ class videoPlayer():
 
         # Filter mouse pointers:
         if(self.mouseCoordinates[0]<0 or self.mouseCoordinates[0]>960):
-            self.mouseCoordinates[0] = None
-            self.mouseCoordinates[1] = None
+            self.mouseCoordinates[0] = -1
+            self.mouseCoordinates[1] = -1
 
 
         if(self.mouseCoordinates[1]<0 or self.mouseCoordinates[1]>540):
-            self.mouseCoordinates[0] = None
-            self.mouseCoordinates[1] = None
+            self.mouseCoordinates[0] = -1
+            self.mouseCoordinates[1] = -1
+
+        # Get the blocks:
+        if(self.mouseCoordinates[0]>-1 or self.mouseCoordinates[1]>-1):
+            self.currentBlock_i = self.mouseCoordinates[0]-self.mouseCoordinates[0]%8
+            self.currentBlock_j = self.mouseCoordinates[1]-self.mouseCoordinates[1]%8
+            self.currentBlock = (self.currentBlock_i//8)+(self.currentBlock_j//8)*(self.videoData.width//8)
 
         # Update display
-        self.mouseStatusDisplay.config(text='Coords: %d,%d'%( self.mouseCoordinates[0], self.mouseCoordinates[1]))
+        self.mouseStatusDisplay.config(text='Coords: %d,%d,%d'%( self.currentBlock_i, self.currentBlock_j,self.currentBlock))
 
 #-----------------------------------------------------------------------------------------------#
 # Toggle gaze control:
@@ -263,4 +272,4 @@ class videoPlayer():
 if __name__ == '__main__':
     #a = videoPlayer('oneperson_960_540.rgb',540,960,3,30)
     a = videoData('oneperson_960_540.rgb',540,960,3)
-    b = videoPlayer.fromVideoFile(a,30)
+    b = videoPlayer.fromVideoFile(a,20)
