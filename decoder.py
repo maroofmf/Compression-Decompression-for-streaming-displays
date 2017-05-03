@@ -37,7 +37,7 @@ def main():
     
     DCTVid = decompressor.loadFromCMP()
     quantizedDCTVid = decompressor.quantize(DCTVid)
-    rgbVid = decompressor.computeIDCT(quantizedDCTVid)
+    rgbVid = decompressor.computeIDCT_Vid(quantizedDCTVid)
     img = np.zeros((height, width, channels), dtype = np.uint8)
     for i in range(channels):
         img[:,:,2-i] = np.uint8(rgbVid[3, i,:,:])
