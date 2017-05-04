@@ -231,7 +231,7 @@ class videoPlayer():
 
         # Gaze control:
         if(self.gazeControl):
-            self.videoData.setBlock(self.videoData.iteratorIndex,self.currentBlock_j,self.currentBlock_i,64)
+            self.videoData.reQuantize(self.videoData.iteratorIndex,self.currentBlock_j,self.currentBlock_i,64)
 
         self.img = ImageTk.PhotoImage(Image.fromarray(np.transpose(self.videoData.currentFrame(),(1,2,0))))
         self.imagePanel.config(image = self.img)
@@ -262,7 +262,7 @@ class videoPlayer():
 
         # Gaze control:
         if(self.gazeControl):
-            self.videoData.setBlock(self.videoData.iteratorIndex+1,self.currentBlock_j,self.currentBlock_i,64)
+            self.videoData.reQuantize(self.videoData.iteratorIndex+1,self.currentBlock_j,self.currentBlock_i,64)
 
         # Update image and pack:
         self.img = ImageTk.PhotoImage(Image.fromarray(np.transpose(next(self.forwardIterator),(1,2,0))))

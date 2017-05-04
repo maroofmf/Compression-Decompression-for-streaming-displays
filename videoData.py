@@ -14,6 +14,7 @@ Notes:
 
 import numpy as np
 import math
+import sys
 
 class videoData:
 
@@ -26,6 +27,7 @@ class videoData:
 		self.height = HEIGHT
 		self.channels = CHANNELS
 		self.patch = 0
+		self.decompressor = None
 
 		# Load from file if FILE_NAME is mentioned
 		if(self.fileName):
@@ -136,20 +138,137 @@ class videoData:
 
 		return self.videoFrames[frameNumber, :,:,:]
 
-	def getBlock(self, frameNumber, i, j, block_size):
-		return self.videoFrames[frameNumber, :, i:i+block_size, j:j+block_size]
-
 #----------------------------------------------------------------------------------------------------------------#
-# Set values in current Frame:
+# Get values in given Frame:
 
-	def setBlock(self,frameNumber,i,j,block_size):
+	def getBlock(self, frameNumber, i, j, block_size):
 
 		# Perform checks:
 		if(frameNumber>=self.totalFrames):
 			frameNumber =0
 
-		self.patch = self.getBlock(frameNumber,i,j,block_size).copy()
-		self.videoFrames[frameNumber,:,i:i+block_size,j:j+block_size] = 0
+		if(i<0):
+			i=0
+
+		if(j<0):
+			j=0
+
+		return self.videoFrames[frameNumber, :, i:i+block_size, j:j+block_size]
+
+#----------------------------------------------------------------------------------------------------------------#
+# Set values in given Frame:
+
+	def setBlock(self,frameNumber,i,j,block_size,blockValues = 0):
+
+		# Perform checks:
+		if(frameNumber>=self.totalFrames):
+			frameNumber =0
+
+		if(i<0):
+			i=0
+
+		if(j<0):
+			j=0
+
+		self.videoFrames[frameNumber, :, i:i+block_size, j:j+block_size] = blockValues
+
+#----------------------------------------------------------------------------------------------------------------#
+# Requantize Frame:
+
+	def reQuantize(self,frameNumber,i,j,block_size):
+
+		# Perform checks:
+		if(frameNumber>=self.totalFrames):
+			frameNumber =0
+		'''
+		# Compute i and j for top right corner;
+		topLeft = [i-block_size//2,j-block_size//2]
+
+		if(topLeft[0] <0):
+			topLeft[0] = 0
+		if(topLeft[0] >=self.height):
+			topLeft[0] = 528
+		if(topLeft[1] <0):
+			topLeft[1] = 0
+		if(topLeft[1] >=self.width):
+			topLeft[1] = 952
+
+		# Compute i and j for top right corner;
+		bottomRight = [i+block_size//2,j+block_size//2]
+
+		if(bottomRight[0] <0):
+			bottomRight[0] = 0
+		if(bottomRight[0] >=self.height):
+			bottomRight[0] = 528
+		if(bottomRight[1] <0):
+			bottomRight[1] = 0
+		if(bottomRight[1] >=self.width):
+			bottomRight[1] = 952
+
+		# Get image Patch:
+		patch = np.empty((1,3,8,8),np.uint8)
+
+		i=topLeft[0]
+		j=topLeft[1]
+		totalRows = (bottomRight[0]-topLeft[0])//8+1
+		totalCols = (bottomRight[1]-topLeft[1])//8+1
+
+		while(i<bottomRight[0]):
+			while(j<bottomRight[1]):
+				blocks = ((i//8)*120+(j//8)+frameNumber*8160)
+				#patch = self.decompressor.computeIDCT(blocks)
+				patch1 = np.zeros((1,3,8,8),dtype=np.uint8)
+				patch = np.append(patch,patch1,0)
+				j+=8
+			i+=8
+
+
+		# Get block numbers:
+		tempPatch = np.empty((3,8,8))
+		first= True
+		for h_offset in range(i-block_size//2,i+block_size//2,8):
+			for w_offset in range(i-block_size//2,i+block_size//2,8):
+
+				if(h_offset<0 or w_offset<0):
+					continue
+
+				tempPatch = np.append(tempPatch,np.zeros((3,8,8)),2)
+
+			patch = np.append(patch,tempPatch,1)
+
+
+		print(np.shape(patch))
+		#print(totalRows,totalCols)
+		#patch = patch.reshape(3,-(topLeft[0]-bottomRight[0])+8,-(topLeft[1]-bottomRight[1]+8))
+		#print(3,(topLeft[0]-bottomRight[0])//8,(topLeft[1]-bottomRight[1])//8)
+		'''
+
+		# Get block numbers:
+		blockList = []
+		temp = []
+		for h_offset in range(i-block_size//2,i+block_size//2,8):
+			for w_offset in range(j-block_size//2,j+block_size//2,8):
+
+				if(h_offset<0 or w_offset<0):
+					continue
+
+				blocks = ((h_offset//8)*120+(w_offset//8)+frameNumber*8160)
+				temp.append(blocks)
+
+			if(not len(temp)==0):
+				blockList.append(temp)
+				temp = []
+
+		# Set patch:
+		self.patch = self.getBlock(frameNumber,i-block_size//2,j-block_size//2,block_size).copy()
+
+		patch = np.zeros((3,np.shape(self.patch)[1],np.shape(self.patch)[2]))
+
+		for index1,rows in enumerate(blockList):
+			for index2,columns in enumerate(rows):
+				patch[:,index1*8:8*(index1+1),index2*8:8*(index2+1)] = self.decompressor.computeIDCT(columns)
+
+		self.setBlock(frameNumber,i-block_size//2,j-block_size//2,block_size,patch)
 
 #----------------------------------------------------------------------------------------------------------------#
 # Repatch:
@@ -160,7 +279,7 @@ class videoData:
 		if(frameNumber>=self.totalFrames):
 			frameNumber =0
 
-		self.videoFrames[frameNumber,:,i:i+block_size,j:j+block_size] = self.patch
+		self.setBlock(frameNumber,i-block_size//2,j-block_size//2,block_size,self.patch)
 
 #----------------------------------------------------------------------------------------------------------------#
 # Get current Frame:

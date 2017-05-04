@@ -42,9 +42,9 @@ def main():
 
     #------------------------------- Read all the frames -------------------------------#
 
-    DCTVid = decompressor.loadFromCMP() # [DCT BLOCKS, DCT COEFFICIENTS]
+    decompressor.loadFromCMP() # [DCT BLOCKS, DCT COEFFICIENTS]
     startTime = time.time()
-    quantizedDCTVid = decompressor.quantize(DCTVid)
+    quantizedDCTVid = decompressor.quantize()
     print('Total deq time: ',time.time()-startTime)
     startTime = time.time()
     rgbVid = decompressor.computeIDCT_Vid(quantizedDCTVid).astype(np.uint8)
@@ -52,6 +52,7 @@ def main():
 
     #Init a videoData:
     dataInstance = videoData.fromArray(rgbVid,height,width,channels)
+    dataInstance.decompressor = decompressor
 
     #dataInstance.dctValues = DCTVid
     player = videoPlayer.fromVideoFile(dataInstance,20)

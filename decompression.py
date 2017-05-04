@@ -14,12 +14,13 @@ class decompression():
         self.quantStepFG = n1
         self.quantStepBG = n2
         self.totalFrames = totalFrames
-        self.framesPerCMP = 50
+        self.framesPerCMP = 100
+        self.CMPData = None
 
     def loadFromCMP(self):
         no_of_frames = self.framesPerCMP
         cmpCounter=0
-        Dct_array = np.zeros((8160*self.totalFrames,193))
+        self.CMPData = np.zeros((8160*self.totalFrames,193))
         startTime = time.time()
         for file_sel in range(int(math.ceil(1.0*self.totalFrames/no_of_frames))):
             startTime = time.time()
@@ -36,7 +37,7 @@ class decompression():
 
             for line in f.read().split('\n'):
                 dctNumsStr = line.split(' ')
-                Dct_array[cmpCounter,:] = list(map(float,dctNumsStr))
+                self.CMPData[cmpCounter,:] = list(map(float,dctNumsStr))
                 frameCount = int(cmpCounter/8160)
                 cmpCounter = cmpCounter +  1
                 cntr1 = cntr1 + 1
@@ -45,9 +46,9 @@ class decompression():
             if frameCount==self.totalFrames:
                 break
             print('Loaded', str(int((file_sel+1) * tillFrame))+'.cmp in ', time.time() - startTime, 'sec')
-        return Dct_array
 
-    def quantize(self, Dct_array):
+    def quantize(self):
+        Dct_array = self.CMPData.copy()
         st = time.time()
         self.totalFrames = self.totalFrames
         no_of_frames = self.framesPerCMP
@@ -67,7 +68,8 @@ class decompression():
             print('Quantazing time ', time.time()- st)
         return Dct_array
 
-    def computeIDCT(self,dct_coef):
+    def computeIDCT(self,block):
+        dct_coef= self.CMPData[block,1:].reshape((3,8,8))
         rgbBlock = np.zeros((3,8,8))
         for channel in range (3):
             rgbBlock[channel,:,:] = np.clip(cv2.idct(dct_coef[channel,:,:]),0,255)
@@ -86,11 +88,11 @@ class decompression():
             block_cntr = 0
             for i in iIndices:
                 for j in jIndices:
-                    dequantised_block = dequantised_coef[8160*frame+block_cntr, 1:].reshape((3,8,8))
-                    rgb_frames[frame,:,i:i+8,j:j+8] = self.computeIDCT(dequantised_block)
-                    # for channel in range (3):
+                    #dequantised_block = dequantised_coef[8160*frame+block_cntr, 1:].reshape((3,8,8))
+                    #rgb_frames[frame,:,i:i+8,j:j+8] = self.computeIDCT(dequantised_block)
+                    for channel in range (3):
                         # rgb_frames[frame,channel,i:i+8,j:j+8] = dequantised_coef[8160*frame+block_cntr, 1:193].reshape(3,8,8)
-                        # rgb_frames[frame,channel,i:i+8,j:j+8] = np.clip(cv2.idct(dequantised_coef[8160*frame+block_cntr,(channel*64)+1:((channel+1)*64)+1].reshape(8,8)),0,255)
+                        rgb_frames[frame,channel,i:i+8,j:j+8] = np.clip(cv2.idct(dequantised_coef[8160*frame+block_cntr,(channel*64)+1:((channel+1)*64)+1].reshape(8,8)),0,255)
                     block_cntr = block_cntr + 1
         print('IDCT time ', time.time()- st)
 
