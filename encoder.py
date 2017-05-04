@@ -49,7 +49,7 @@ def main():
         # cv2.waitKey(0)
         
         foregroundCount = segmentor.segmentBlocksInFrame(currFrame, prevFrame, frameNumber, SAD_Thresh_list[threshIndex])
-        print SAD_Thresh_list[threshIndex]
+        #print SAD_Thresh_list[threshIndex]
         
         if(foregroundCount>100):
             threshIndex += 1
@@ -73,7 +73,7 @@ def main():
     print 'Starting compression: '
     startTime = time.time()
     compressor.saveCMP()
-    print 'Time to segment all frames', time.time()-startTime, 'sec\n\n'
+    print 'Time to compress all frames', time.time()-startTime, 'sec\n\n'
     
     #-----------------------------------------------------------------------------------#
 ##----------------------------------------------------------------------------------------------------------------##

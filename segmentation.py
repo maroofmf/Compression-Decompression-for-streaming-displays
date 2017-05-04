@@ -29,27 +29,27 @@ class segmentation(videoData):
         self.__searchWin = k
         self.globalMotion = [0,0]
     
-    def findGlobalMotion(self, frame, prevFrame):
-        iIndices = range(2*self.__blockSize, 5*self.__blockSize, self.__blockSize)
-        jIndices = range(0, self.__vidData.getWidth(), self.__blockSize)
-        motionVectors = np.zeros((len(iIndices)*len(jIndices), 2))
-        height = self.__vidData.getHeight()
-        width = self.__vidData.getWidth()
-        k = self.__searchWin
-        blockCounter = 0
-        for i in iIndices:
-            for j in jIndices:
-                block = frame[i:i+self.__blockSize, j:j+self.__blockSize]
-                topLeft = [max((i-k), 0), max((j-k),0)]
-                bottomRight = [min(i+k+self.__blockSize-1, height-1), min(j+k+self.__blockSize-1, width-1)]
-                # print topLeft, bottomRight
-                searchSpace = prevFrame[topLeft[ROW]:bottomRight[ROW]+1, topLeft[COL]:bottomRight[COL]+1] # +1 so that bottomRight is included too
-                dx, dy = self.computeMotionVectorPyramid(searchSpace, block, [i-topLeft[ROW], j-topLeft[COL]])
-                motionVectors[blockCounter] = dx, dy
-                blockCounter += 1
-        glblMotion = stats.mode(motionVectors)
-        self.globalMotion = [glblMotion.mode[0][ROW], glblMotion.mode[0][COL]]
-        return self.globalMotion
+    # def findGlobalMotion(self, frame, prevFrame):
+        # iIndices = range(2*self.__blockSize, 5*self.__blockSize, self.__blockSize)
+        # jIndices = range(0, self.__vidData.getWidth(), self.__blockSize)
+        # motionVectors = np.zeros((len(iIndices)*len(jIndices), 2))
+        # height = self.__vidData.getHeight()
+        # width = self.__vidData.getWidth()
+        # k = self.__searchWin
+        # blockCounter = 0
+        # for i in iIndices:
+            # for j in jIndices:
+                # block = frame[i:i+self.__blockSize, j:j+self.__blockSize]
+                # topLeft = [max((i-k), 0), max((j-k),0)]
+                # bottomRight = [min(i+k+self.__blockSize-1, height-1), min(j+k+self.__blockSize-1, width-1)]
+                # # print topLeft, bottomRight
+                # searchSpace = prevFrame[topLeft[ROW]:bottomRight[ROW]+1, topLeft[COL]:bottomRight[COL]+1] # +1 so that bottomRight is included too
+                # dx, dy = self.computeMotionVectorPyramid(searchSpace, block, [i-topLeft[ROW], j-topLeft[COL]])
+                # motionVectors[blockCounter] = dx, dy
+                # blockCounter += 1
+        # glblMotion = stats.mode(motionVectors)
+        # self.globalMotion = [glblMotion.mode[0][ROW], glblMotion.mode[0][COL]]
+        # return self.globalMotion
         
     def segmentBlocksInFrame(self, frame, prevFrame, frameNumber, SAD_Thresh):
         #shiftdx, shiftdy = self.findGlobalMotion(frame, prevFrame)
@@ -91,7 +91,7 @@ class segmentation(videoData):
                         # print i,j, SADval, (dx, dy)
                         self.setLabel(frameNumber, blockCounter, 1) # Foreground
                         foregroundCount += 1
-                        cv2.rectangle(frame, (j, i), (j + 16, i + 16), (0, 255, 0), 2)
+                        # cv2.rectangle(frame, (j, i), (j + 16, i + 16), (0, 255, 0), 2)
                         # cv2.imshow('searchSpace', np.uint8(searchSpace))
                         # cv2.waitKey(0)
                 else:
@@ -103,8 +103,8 @@ class segmentation(videoData):
                     # exit(0)
                 blockCounter += 1
         
-        cv2.imshow('frame', np.uint8(frame))
-        cv2.waitKey(1)
+        # cv2.imshow('frame', np.uint8(frame))
+        # cv2.waitKey(1)
 #        if cv2.waitKey(1) & 0xFF == ord('h'):        
 #            cv2.destroyAllWindows()
         # cv2.imshow('frame', np.uint8(frame))
