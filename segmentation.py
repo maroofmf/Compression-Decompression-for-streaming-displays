@@ -14,6 +14,7 @@ import cv2
 import numpy as np
 from videoData import videoData
 import matplotlib.pyplot as plt
+from scipy import stats
 
 ROW = 0
 COL = 1
@@ -28,32 +29,32 @@ class segmentation(videoData):
         self.__searchWin = k
         self.globalMotion = [0,0]
     
-    # def findGlobalMotion(self, frame, prevFrame):
-        # iIndices = range(2*self.__blockSize, 5*self.__blockSize, self.__blockSize)
-        # jIndices = range(0, self.__vidData.getWidth(), self.__blockSize)
-        # motionVectors = np.zeros((len(iIndices)*len(jIndices), 2))
-        # height = self.__vidData.getHeight()
-        # width = self.__vidData.getWidth()
-        # k = self.__searchWin
-        # blockCounter = 0
-        # for i in iIndices:
-            # for j in jIndices:
-                # block = frame[i:i+self.__blockSize, j:j+self.__blockSize]
-                # topLeft = [max((i-k), 0), max((j-k),0)]
-                # bottomRight = [min(i+k+self.__blockSize-1, height-1), min(j+k+self.__blockSize-1, width-1)]
-                # # print topLeft, bottomRight
-                # searchSpace = prevFrame[topLeft[ROW]:bottomRight[ROW]+1, topLeft[COL]:bottomRight[COL]+1] # +1 so that bottomRight is included too
-                # dx, dy = self.computeMotionVectorPyramid(searchSpace, block, [i-topLeft[ROW], j-topLeft[COL]])
-                # motionVectors[blockCounter] = dx, dy
-                # blockCounter += 1
-        # glblMotion = stats.mode(motionVectors)
-        # self.globalMotion = [glblMotion.mode[0][ROW], glblMotion.mode[0][COL]]
-        # return self.globalMotion
+    def findGlobalMotion(self, frame, prevFrame):
+        iIndices = range(2*self.__blockSize, 5*self.__blockSize, self.__blockSize)
+        jIndices = range(0, self.__vidData.getWidth(), self.__blockSize)
+        motionVectors = np.zeros((len(iIndices)*len(jIndices), 2))
+        height = self.__vidData.getHeight()
+        width = self.__vidData.getWidth()
+        k = self.__searchWin
+        blockCounter = 0
+        for i in iIndices:
+            for j in jIndices:
+                block = frame[i:i+self.__blockSize, j:j+self.__blockSize]
+                topLeft = [max((i-k), 0), max((j-k),0)]
+                bottomRight = [min(i+k+self.__blockSize-1, height-1), min(j+k+self.__blockSize-1, width-1)]
+                # print topLeft, bottomRight
+                searchSpace = prevFrame[topLeft[ROW]:bottomRight[ROW]+1, topLeft[COL]:bottomRight[COL]+1] # +1 so that bottomRight is included too
+                dx, dy = self.computeMotionVectorPyramid(searchSpace, block, [i-topLeft[ROW], j-topLeft[COL]])
+                motionVectors[blockCounter] = dx, dy
+                blockCounter += 1
+        glblMotion = stats.mode(motionVectors)
+        self.globalMotion = [glblMotion.mode[0][ROW], glblMotion.mode[0][COL]]
+        return self.globalMotion
         
     def segmentBlocksInFrame(self, frame, prevFrame, frameNumber, SAD_Thresh):
-        # shiftdx, shiftdy = self.findGlobalMotion(frame, prevFrame)
+        #shiftdx, shiftdy = self.findGlobalMotion(frame, prevFrame)
         # print shiftdx, shiftdy
-        # prevFrame[10:-10,10:-10] = prevFrame[10+shiftdx: -10+shiftdx , 10+shiftdy: -10+shiftdy]
+        #prevFrame[15:-15,15:-15] = prevFrame[15+shiftdx: -15+shiftdx , 15+shiftdy: -15+shiftdy]
         # cv2.imshow('prevframe', np.uint8(prevFrame))
         # cv2.waitKey(1)
         #------------- Indices to traverse in the rows and cols ---------------#

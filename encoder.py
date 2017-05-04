@@ -38,8 +38,8 @@ def main():
     prevFrame = vidData.getFrame(0)
     prevFrame = y_weight*segmentor.YfromRGB(prevFrame) + H_weight*segmentor.HfromRGB(prevFrame) + S_weight*segmentor.SfromRGB(prevFrame)
     
-    SAD_Thresh_list = np.arange(13)*1000
-    threshIndex = 6
+    SAD_Thresh_list = range(5000, 12001, 1000)
+    threshIndex = 1
 
     for frameNumber in range (1, vidData.totalFrames):
         #---------------- Segment the Nth frame in the segmentor -----------------------#
@@ -53,7 +53,7 @@ def main():
         
         if(foregroundCount>100):
             threshIndex += 1
-            threshIndex = min(12, threshIndex)
+            threshIndex = min(len(SAD_Thresh_list)-1, threshIndex)
         elif(foregroundCount<20):
             threshIndex -= 1
             threshIndex = max(0, threshIndex)
