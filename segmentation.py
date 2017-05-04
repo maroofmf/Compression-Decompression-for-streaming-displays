@@ -14,7 +14,7 @@ import cv2
 import numpy as np
 from videoData import videoData
 import matplotlib.pyplot as plt
-SAD_Thresh = 6000
+SAD_Thresh =5000
 ROW = 0
 COL = 1
 R_CHANNEL = 0
@@ -62,7 +62,7 @@ class segmentation(videoData):
                     else:
                         # print i,j, SADval, (dx, dy)
                         self.setLabel(frameNumber, blockCounter, 1) # Foreground
-#                        cv2.rectangle(frame, (j, i), (j + 16, i + 16), (0, 255, 0), 2)
+                        cv2.rectangle(frame, (j, i), (j + 16, i + 16), (0, 255, 0), 2)
                         # cv2.imshow('searchSpace', np.uint8(searchSpace))
                         # cv2.waitKey(0)
                 else:
@@ -73,8 +73,8 @@ class segmentation(videoData):
                     # cv2.waitKey(0)
                     # exit(0)
                 blockCounter += 1
-#        cv2.imshow('frame', np.uint8(frame))
-#        cv2.waitKey(1)
+        cv2.imshow('frame', np.uint8(frame))
+        cv2.waitKey(1)
 #        if cv2.waitKey(1) & 0xFF == ord('h'):        
 #            cv2.destroyAllWindows()
         # cv2.imshow('frame', np.uint8(frame))
@@ -154,8 +154,16 @@ class segmentation(videoData):
     # and not (rows, cols, 3) as needed in cvtColor. So using the formula for YUV to RGB
     # Source: http://www.pcmag.com/encyclopedia/term/55166/yuv-rgb-conversion-formulas
     def YfromRGB(self,frame):
-        gray = np.empty((frame.shape[1], frame.shape[2]), dtype = 'uint8')
-        gray = 0.299*frame[R_CHANNEL, :, :] + 0.587*frame[G_CHANNEL, :, :] + 0.114*frame[B_CHANNEL, :, :]
+        bgr = np.empty((frame.shape[1], frame.shape[2], frame.shape[0]), dtype = 'uint8')
+        bgr[:,:,2] = frame[0,:,:]
+        bgr[:,:,1] = frame[1,:,:]
+        bgr[:,:,0] = frame[2,:,:]
+#        hue = np.empty((hsv.shape[0], hsv.shape[1],hsv.shape[2]), dtype = 'uint8')
+        gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+#        gray = 0.299*frame[R_CHANNEL, :, :] + 0.587*frame[G_CHANNEL, :, :] + 0.114*frame[B_CHANNEL, :, :]
+        gray = cv2.equalizeHist(gray)
+        
+#        cv2.normalize(gray, gray, alpha=50,beta=60, norm_type=cv2.NORM_MINMAX)
         return np.int16(gray)
         
     def SfromRGB(self,frame):
@@ -166,9 +174,20 @@ class segmentation(videoData):
         hsv[:,:,0] = frame[2,:,:]
 #        hue = np.empty((hsv.shape[0], hsv.shape[1],hsv.shape[2]), dtype = 'uint8')
         saturation = cv2.cvtColor(hsv, cv2.COLOR_BGR2HSV)[:,:,1]
-        
+        saturation = cv2.equalizeHist(saturation)
         return np.int16(saturation)
 
+    def HfromRGB(self,frame):
+        hsv = np.empty((frame.shape[1], frame.shape[2], frame.shape[0]), dtype = 'uint8')
+#        print frame.shape
+        hsv[:,:,2] = frame[0,:,:]
+        hsv[:,:,1] = frame[1,:,:]
+        hsv[:,:,0] = frame[2,:,:]
+#        hue = np.empty((hsv.shape[0], hsv.shape[1],hsv.shape[2]), dtype = 'uint8')
+        hue = cv2.cvtColor(hsv, cv2.COLOR_BGR2HSV)[:,:,0]
+        hue = cv2.equalizeHist(hue)
+        return np.int16(hue)
+        
     def setLabel(self, frameNumber, blockCounter, label):
         r = blockCounter/60
         c = blockCounter%60

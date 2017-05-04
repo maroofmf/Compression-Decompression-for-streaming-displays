@@ -33,13 +33,14 @@ def main():
     #------------------------- Segment from the 2nd frame ------------------------------#
     print 'Starting segmentation: '
     y_weight = 0.3
-    S_weight = 0.7    
+    H_weight = 0.6    
+    S_weight = 0.1
     prevFrame = vidData.getFrame(0)
-    prevFrame = y_weight*segmentor.YfromRGB(prevFrame) + S_weight*segmentor.SfromRGB(prevFrame)
+    prevFrame = y_weight*segmentor.YfromRGB(prevFrame) + H_weight*segmentor.HfromRGB(prevFrame) + S_weight*segmentor.SfromRGB(prevFrame)
     for frameNumber in range (1, vidData.totalFrames):
         #---------------- Segment the Nth frame in the segmentor -----------------------#
         currFrame = vidData.getFrame(frameNumber)
-        currFrame = y_weight*segmentor.YfromRGB(currFrame) + S_weight*segmentor.SfromRGB(currFrame)
+        currFrame = y_weight*segmentor.YfromRGB(currFrame) + H_weight*segmentor.HfromRGB(currFrame) + S_weight*segmentor.SfromRGB(currFrame)
         # cv2.imshow('frame', np.uint8(currFrame))
         # cv2.waitKey(0)
         segmentor.segmentBlocksInFrame(currFrame, prevFrame, frameNumber)
@@ -47,7 +48,9 @@ def main():
             print 'Total frames segmented', frameNumber
         # print vidData.getLabel(frameNumber, 336/8, 192/8)
         #---------------------------- Update prevFrame ---------------------------------#
-        prevFrame = currFrame
+        prevFrame1 = vidData.getFrame(frameNumber-0)
+        prevFrame1 = y_weight*segmentor.YfromRGB(prevFrame1) + H_weight*segmentor.HfromRGB(prevFrame1) + S_weight*segmentor.SfromRGB(prevFrame1)
+        prevFrame = prevFrame1
     #-----------------------------------------------------------------------------------#
     
     #----------------- Compress all the frames using label knowledge -------------------#
@@ -55,7 +58,7 @@ def main():
     
     print 'Starting compression: '
     startTime = time.time()
-    compressor.saveCMP()
+#    compressor.saveCMP()
     print 'Time to segment all frames', time.time()-startTime, 'sec\n\n'
     
     #-----------------------------------------------------------------------------------#
