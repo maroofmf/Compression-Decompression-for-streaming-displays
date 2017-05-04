@@ -1,11 +1,6 @@
+__pycache__
 *.pyc
 *.rgb
 *.raw
-*.jpg
-*.png
-*.JPEG
-<<<<<<< HEAD
 *.cmp
-=======
 *.DS_Store
->>>>>>> a2a06ef7495c03d15a69e6d83265a4b2ad2a2525
