@@ -18,6 +18,12 @@ class decompression():
         self.CMPData = None
 
     def loadFromCMP(self):
+
+        startTime = time.time()
+        self.CMPData = np.load('DCTValues.npy')
+        print('Data loaded in: ', time.time()-startTime)
+
+        '''
         no_of_frames = self.framesPerCMP
         cmpCounter=0
         self.CMPData = np.zeros((8160*self.totalFrames,193))
@@ -31,9 +37,21 @@ class decompression():
                 tillFrame = no_of_frames
                 till_frame_number = no_of_frames
 
-            f = open('DCT'+str(int((file_sel+1) * tillFrame))+'.cmp')
-
             cntr1 = 0
+
+            with open('DCT'+str(int((file_sel+1) * tillFrame))+'.cmp') as f:
+                for line in f:
+                    dctNumsStr = line.split(' ')
+                    self.CMPData[cmpCounter,:] = list(map(float,dctNumsStr))
+                    frameCount = int(cmpCounter/8160)
+                    cmpCounter = cmpCounter +  1
+                    cntr1 = cntr1 + 1
+                    if cntr1 == 8160 * till_frame_number:
+                        break
+                if frameCount==self.totalFrames:
+                    break
+                print('Loaded', str(int((file_sel+1) * tillFrame))+'.cmp in ', time.time() - startTime, 'sec')
+
 
             for line in f.read().split('\n'):
                 dctNumsStr = line.split(' ')
@@ -46,6 +64,7 @@ class decompression():
             if frameCount==self.totalFrames:
                 break
             print('Loaded', str(int((file_sel+1) * tillFrame))+'.cmp in ', time.time() - startTime, 'sec')
+            '''
 
     def quantize(self):
         Dct_array = self.CMPData.copy()

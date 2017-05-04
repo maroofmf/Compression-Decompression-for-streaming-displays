@@ -42,9 +42,8 @@ class compression():
         jIndices = list(range(0, self.vidData.getWidth(), self.__blockSize))
         no_of_blocks = len(iIndices)*len(jIndices)
 #        print no_of_blocks
-        framesPerCMP = 50
+        framesPerCMP = self.vidData.totalFrames
         blockDCT = np.zeros((framesPerCMP*no_of_blocks,(8*8*3 )+ 1))
-
         iIndices[-1] = self.vidData.getHeight() - self.__blockSize
         jIndices[-1] = self.vidData.getWidth() - self.__blockSize
 #        self.vidData.totalFrames
@@ -59,6 +58,7 @@ class compression():
                     cntr = cntr + 1
             cntr_frame = cntr_frame + 1
             if cntr_frame % framesPerCMP == 0 or cntr_frame==self.vidData.totalFrames:
-                np.savetxt('DCT'+str(cntr_frame) + '.cmp', blockDCT[0:cntr,:], fmt='%1.1f')
+                #np.savetxt('DCT'+str(cntr_frame) + '.cmp', blockDCT[0:cntr,:], fmt='%1.1f')
+                np.save('DCTValues.npy',blockDCT)
                 cntr = 0
                 print('Wrote', 'DCT'+str(cntr_frame) + '.cmp')
