@@ -2,5 +2,6 @@ __pycache__
 *.pyc
 *.rgb
 *.raw
+*.npy
 *.cmp
 *.DS_Store
