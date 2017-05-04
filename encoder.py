@@ -14,7 +14,7 @@ import os
 ##----------------------------------------------------------------------------------------------------------------##
 def main():
     print('PID: %d'%(os.getpid()))
-    fileName = sys.argv[1]
+    fileName = 'oneperson_960_540.rgb'
     height = 540
     width = 960
     channels = 3
@@ -22,7 +22,7 @@ def main():
     #------------------------------ Construct objects ----------------------------------#
     vidData = videoData(fileName, height, width, channels)
     compressor = compression(vidData);
-    searchWin = 16
+    searchWin = 20
     segmentor = segmentation(vidData, searchWin)
     #-----------------------------------------------------------------------------------#
 
@@ -33,13 +33,15 @@ def main():
     #-----------------------------------------------------------------------------------#
 
     #------------------------- Segment from the 2nd frame ------------------------------#
-    print('Starting segmentation: ')
+    print 'Starting segmentation: '
+    y_weight = 0.3
+    S_weight = 0.7
     prevFrame = vidData.getFrame(0)
-    prevFrame = segmentor.YfromRGB(prevFrame)
+    prevFrame = y_weight*segmentor.YfromRGB(prevFrame) + S_weight*segmentor.SfromRGB(prevFrame)
     for frameNumber in range (1, vidData.totalFrames):
         #---------------- Segment the Nth frame in the segmentor -----------------------#
         currFrame = vidData.getFrame(frameNumber)
-        currFrame = segmentor.YfromRGB(currFrame)
+        currFrame = y_weight*segmentor.YfromRGB(currFrame) + S_weight*segmentor.SfromRGB(currFrame)
         # cv2.imshow('frame', np.uint8(currFrame))
         # cv2.waitKey(0)
         segmentor.segmentBlocksInFrame(currFrame, prevFrame, frameNumber)
@@ -56,7 +58,8 @@ def main():
     print('Starting compression: ')
     startTime = time.time()
     compressor.saveCMP()
-    print('Time to segment all frames', time.time()-startTime, 'sec\n\n')
+    print 'Time to segment all frames', time.time()-startTime, 'sec\n\n'
+
     #-----------------------------------------------------------------------------------#
 ##----------------------------------------------------------------------------------------------------------------##
 if __name__ == '__main__':
