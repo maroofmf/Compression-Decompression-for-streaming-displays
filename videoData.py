@@ -59,11 +59,11 @@ class videoData:
 # Metadata:
 
 	def writeMetaData(self):
-		metaData = str(int(self.__width))+'\n'
-		metaData += str(int(self.__height))+'\n'
-		metaData += str(int(self.__channels))+'\n'
+		metaData = str(int(self.width))+'\n'
+		metaData += str(int(self.height))+'\n'
+		metaData += str(int(self.channels))+'\n'
 		metaData += str(int(self.totalFrames))+'\n'
-		metaData += str(int(self.__frameRate))
+		metaData += str(30)
 
 		metaFile = open('MetaData.txt','w')
 		metaFile.write(metaData)
