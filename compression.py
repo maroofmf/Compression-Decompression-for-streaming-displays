@@ -32,7 +32,7 @@ class compression():
             block = block3D[channel, :, :]
             block_f = np.float32(block)  # float conversion/scale
             dct_coeffs = cv2.dct(block_f)           # the dct
-            channelDCT[(block_size*block_size*channel)+1:(block_size*block_size*(channel+1))+1] = np.around(dct_coeffs.reshape((1, block_size*block_size)),1)
+            channelDCT[(block_size*block_size*channel)+1:(block_size*block_size*(channel+1))+1] = dct_coeffs.reshape((1, block_size*block_size))
         return channelDCT
         
     def saveCMP(self):
