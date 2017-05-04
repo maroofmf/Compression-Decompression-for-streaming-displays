@@ -14,7 +14,7 @@ class decompression():
         self.quantStepFG = n1
         self.quantStepBG = n2
         self.totalFrames = totalFrames
-        self.framesPerCMP = 100
+        self.framesPerCMP = 50
         self.CMPData = None
 
     def loadFromCMP(self):

@@ -13,7 +13,6 @@ Notes:
 import cv2
 import numpy as np
 from videoData import videoData
-SAD_Thresh = 6000
 ROW = 0
 COL = 1
 R_CHANNEL = 0
@@ -25,11 +24,36 @@ class segmentation(videoData):
         self.__blockSize = 16
         self.__vidData = vidData
         self.__searchWin = k
+        self.globalMotion = [0,0]
 
-    def segmentBlocksInFrame(self, frame, prevFrame, frameNumber):
-        shiftdx = 0
-        shiftdy = 0
-        prevFrame[4:-5,4:-5] = prevFrame[4-shiftdx: -5-shiftdx , 4-shiftdy: -5-shiftdy]
+    # def findGlobalMotion(self, frame, prevFrame):
+        # iIndices = range(2*self.__blockSize, 5*self.__blockSize, self.__blockSize)
+        # jIndices = range(0, self.__vidData.getWidth(), self.__blockSize)
+        # motionVectors = np.zeros((len(iIndices)*len(jIndices), 2))
+        # height = self.__vidData.getHeight()
+        # width = self.__vidData.getWidth()
+        # k = self.__searchWin
+        # blockCounter = 0
+        # for i in iIndices:
+            # for j in jIndices:
+                # block = frame[i:i+self.__blockSize, j:j+self.__blockSize]
+                # topLeft = [max((i-k), 0), max((j-k),0)]
+                # bottomRight = [min(i+k+self.__blockSize-1, height-1), min(j+k+self.__blockSize-1, width-1)]
+                # # print topLeft, bottomRight
+                # searchSpace = prevFrame[topLeft[ROW]:bottomRight[ROW]+1, topLeft[COL]:bottomRight[COL]+1] # +1 so that bottomRight is included too
+                # dx, dy = self.computeMotionVectorPyramid(searchSpace, block, [i-topLeft[ROW], j-topLeft[COL]])
+                # motionVectors[blockCounter] = dx, dy
+                # blockCounter += 1
+        # glblMotion = stats.mode(motionVectors)
+        # self.globalMotion = [glblMotion.mode[0][ROW], glblMotion.mode[0][COL]]
+        # return self.globalMotion
+
+    def segmentBlocksInFrame(self, frame, prevFrame, frameNumber, SAD_Thresh):
+        #shiftdx, shiftdy = self.findGlobalMotion(frame, prevFrame)
+        # print shiftdx, shiftdy
+        #prevFrame[15:-15,15:-15] = prevFrame[15+shiftdx: -15+shiftdx , 15+shiftdy: -15+shiftdy]
+        # cv2.imshow('prevframe', np.uint8(prevFrame))
+        # cv2.waitKey(1)
         #------------- Indices to traverse in the rows and cols ---------------#
         iIndices = list(range(0, self.__vidData.getHeight(), self.__blockSize))
         jIndices = list(range(0, self.__vidData.getWidth(), self.__blockSize))
@@ -43,7 +67,9 @@ class segmentation(videoData):
         width = self.__vidData.getWidth()
         k = self.__searchWin
         # motionVectors = np.zeros((len(iIndices)*len(jIndices), 2))
+        foregroundCount = 0
         blockCounter = 0
+
         for i in iIndices:
             for j in jIndices:
                 block = frame[i:i+self.__blockSize, j:j+self.__blockSize]
@@ -51,7 +77,7 @@ class segmentation(videoData):
                 bottomRight = [min(i+k+self.__blockSize-1, height-1), min(j+k+self.__blockSize-1, width-1)]
                 # print topLeft, bottomRight
                 searchSpace = prevFrame[topLeft[ROW]:bottomRight[ROW]+1, topLeft[COL]:bottomRight[COL]+1] # +1 so that bottomRight is included too
-                SADval, bgBlock = self.SAD_Check(searchSpace, block, [i-topLeft[ROW], j-topLeft[COL]])
+                SADval, bgBlock = self.SAD_Check(searchSpace, block, [i-topLeft[ROW], j-topLeft[COL]], SAD_Thresh)
                 dx, dy = [0, 0]
 
                 if bgBlock == False:
@@ -61,7 +87,8 @@ class segmentation(videoData):
                     else:
                         # print i,j, SADval, (dx, dy)
                         self.setLabel(frameNumber, blockCounter, 1) # Foreground
-#                        cv2.rectangle(frame, (j, i), (j + 16, i + 16), (0, 255, 0), 2)
+                        foregroundCount += 1
+                        # cv2.rectangle(frame, (j, i), (j + 16, i + 16), (0, 255, 0), 2)
                         # cv2.imshow('searchSpace', np.uint8(searchSpace))
                         # cv2.waitKey(0)
                 else:
@@ -72,8 +99,9 @@ class segmentation(videoData):
                     # cv2.waitKey(0)
                     # exit(0)
                 blockCounter += 1
-#        cv2.imshow('frame', np.uint8(frame))
-#        cv2.waitKey(1)
+
+        # cv2.imshow('frame', np.uint8(frame))
+        # cv2.waitKey(1)
 #        if cv2.waitKey(1) & 0xFF == ord('h'):
 #            cv2.destroyAllWindows()
         # cv2.imshow('frame', np.uint8(frame))
@@ -84,8 +112,9 @@ class segmentation(videoData):
         # fig.plot(motionVectors[:,0], motionVectors[:,1], 'b*')
         # fig.grid()
         # fig.show()
+        return foregroundCount
 
-    def SAD_Check(self, searchSpace, block, blockTopLeft):
+    def SAD_Check(self, searchSpace, block, blockTopLeft, SAD_Thresh):
         i = blockTopLeft[ROW]
         j = blockTopLeft[COL]
         blockSize = block.shape[ROW] # or COL; same thing
@@ -109,8 +138,8 @@ class segmentation(videoData):
         minSAD_TopLeft = [minSAD_pos[ROW].tolist()[0], minSAD_pos[COL].tolist()[0]]
         # print 'blockTopLeft', blockTopLeft, '\t minSAD_TopLeft', minSAD_TopLeft, 'minSAD_pos', minSAD_pos
         # np.savetxt('SADvals.txt', SADvals, fmt='%d')
-        dx = minSAD_TopLeft[0]-blockTopLeft[0]
-        dy = minSAD_TopLeft[1]-blockTopLeft[1]
+        dx = minSAD_TopLeft[1]-blockTopLeft[1]
+        dy = minSAD_TopLeft[0]-blockTopLeft[0]
         return dx, dy
 
     def computeMotionVectorPyramid(self, searchSpace, block, blockTopLeft):
@@ -153,8 +182,16 @@ class segmentation(videoData):
     # and not (rows, cols, 3) as needed in cvtColor. So using the formula for YUV to RGB
     # Source: http://www.pcmag.com/encyclopedia/term/55166/yuv-rgb-conversion-formulas
     def YfromRGB(self,frame):
-        gray = np.empty((frame.shape[1], frame.shape[2]), dtype = 'uint8')
-        gray = 0.299*frame[R_CHANNEL, :, :] + 0.587*frame[G_CHANNEL, :, :] + 0.114*frame[B_CHANNEL, :, :]
+        bgr = np.empty((frame.shape[1], frame.shape[2], frame.shape[0]), dtype = 'uint8')
+        bgr[:,:,2] = frame[0,:,:]
+        bgr[:,:,1] = frame[1,:,:]
+        bgr[:,:,0] = frame[2,:,:]
+#        hue = np.empty((hsv.shape[0], hsv.shape[1],hsv.shape[2]), dtype = 'uint8')
+        gray = 255-cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+#        gray = 0.299*frame[R_CHANNEL, :, :] + 0.587*frame[G_CHANNEL, :, :] + 0.114*frame[B_CHANNEL, :, :]
+        gray = cv2.equalizeHist(gray)
+
+#        cv2.normalize(gray, gray, alpha=50,beta=60, norm_type=cv2.NORM_MINMAX)
         return np.int16(gray)
 
     def SfromRGB(self,frame):
@@ -165,8 +202,19 @@ class segmentation(videoData):
         hsv[:,:,0] = frame[2,:,:]
 #        hue = np.empty((hsv.shape[0], hsv.shape[1],hsv.shape[2]), dtype = 'uint8')
         saturation = cv2.cvtColor(hsv, cv2.COLOR_BGR2HSV)[:,:,1]
-
+        saturation = cv2.equalizeHist(saturation)
         return np.int16(saturation)
+
+    def HfromRGB(self,frame):
+        hsv = np.empty((frame.shape[1], frame.shape[2], frame.shape[0]), dtype = 'uint8')
+#        print frame.shape
+        hsv[:,:,2] = frame[0,:,:]
+        hsv[:,:,1] = frame[1,:,:]
+        hsv[:,:,0] = frame[2,:,:]
+#        hue = np.empty((hsv.shape[0], hsv.shape[1],hsv.shape[2]), dtype = 'uint8')
+        hue = cv2.cvtColor(hsv, cv2.COLOR_BGR2HSV)[:,:,0]
+        hue = cv2.equalizeHist(hue)
+        return np.int16(hue)
 
     def setLabel(self, frameNumber, blockCounter, label):
         r = int(blockCounter/60)
