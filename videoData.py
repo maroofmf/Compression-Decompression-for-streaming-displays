@@ -142,14 +142,19 @@ class videoData:
 #----------------------------------------------------------------------------------------------------------------#
 # Set values in current Frame:
 
-	def setBlock(self,frameNumber,i,j,block_size):
+	def setBlock(self,frameNumber,i,j,block_size,blockValues = 0):
 
 		# Perform checks:
 		if(frameNumber>=self.totalFrames):
 			frameNumber =0
 
-		self.patch = self.getBlock(frameNumber,i,j,block_size).copy()
-		self.videoFrames[frameNumber,:,i:i+block_size,j:j+block_size] = 0
+		self.videoFrames[frameNumber, :, i:i+block_size, j:j+block_size] = blockValues
+
+	def reQuantize(self,frameNumber,i,j,block_size):
+
+		self.patch = self.getBlock(frameNumber,i-block_size//2,j-block_size//2,block_size).copy()
+		self.setBlock(frameNumber,i-block_size//2,j-block_size//2,block_size)
+		#self.videoFrames[frameNumber,:,i:i+64,j:j+64] = 0
 
 #----------------------------------------------------------------------------------------------------------------#
 # Repatch:
@@ -160,7 +165,9 @@ class videoData:
 		if(frameNumber>=self.totalFrames):
 			frameNumber =0
 
-		self.videoFrames[frameNumber,:,i:i+block_size,j:j+block_size] = self.patch
+		self.setBlock(frameNumber,i-block_size//2,j-block_size//2,block_size,self.patch)
+
+		#self.videoFrames[frameNumber,:,i-block_size//2:i+block_size//2,j-block_size//2:j+block_size//2] = self.patch
 
 #----------------------------------------------------------------------------------------------------------------#
 # Get current Frame:
