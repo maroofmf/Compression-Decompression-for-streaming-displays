@@ -14,7 +14,7 @@ import os
 ##----------------------------------------------------------------------------------------------------------------##
 def main():
     print('PID: %d'%(os.getpid()))
-    fileName = 'oneperson_960_540.rgb'
+    #fileName = 'oneperson_960_540.rgb'
     fileName = sys.argv[1]
     height = 540
     width = 960

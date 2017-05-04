@@ -26,9 +26,9 @@ def main():
 
     print('PID: %d',os.getpid())
 
-    n1 = 1#int(sys.argv[1])
-    n2 = 100#int(sys.argv[2])
-    gazeControl = 0#int(sys.argv[3])
+    n1 = int(sys.argv[1])
+    n2 = int(sys.argv[2])
+    gazeControl = int(sys.argv[3])
     width, height, channels, totalFrames, frameRate = parseMetaData()
 
     # height = 540

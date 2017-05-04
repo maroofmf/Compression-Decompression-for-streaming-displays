@@ -289,5 +289,5 @@ class videoPlayer():
 
 if __name__ == '__main__':
     #a = videoPlayer('oneperson_960_540.rgb',540,960,3,30)
-    a = videoData('oneperson_960_540.rgb',540,960,3)
+    a = videoData('two_people_moving_background.rgb',540,960,3)
     b = videoPlayer.fromVideoFile(a,20)
