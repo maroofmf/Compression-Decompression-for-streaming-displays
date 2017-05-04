@@ -147,13 +147,20 @@ class videoData:
 		if(frameNumber>=self.totalFrames):
 			frameNumber =0
 
+		i_low = i
+		i_high = i+block_size
+		j_low = j
+		j_high = j+block_size
+
 		if(i<0):
-			i=0
+			i_low=0
+			i_high = block_size+i
 
 		if(j<0):
-			j=0
+			j_low=0
+			j_high = block_size+j
 
-		return self.videoFrames[frameNumber, :, i:i+block_size, j:j+block_size]
+		return self.videoFrames[frameNumber, :, i_low:i_high, j_low:j_high]
 
 #----------------------------------------------------------------------------------------------------------------#
 # Set values in given Frame:
@@ -164,13 +171,21 @@ class videoData:
 		if(frameNumber>=self.totalFrames):
 			frameNumber =0
 
+		i_low = i
+		i_high = i+block_size
+		j_low = j
+		j_high = j+block_size
+
 		if(i<0):
-			i=0
+			i_low=0
+			i_high = block_size+i
 
 		if(j<0):
-			j=0
+			j_low=0
+			j_high = block_size+j
 
-		self.videoFrames[frameNumber, :, i:i+block_size, j:j+block_size] = blockValues
+		#print(np.shape(blockValues),np.shape(self.videoFrames[frameNumber, :, i_low:i_high, j_low:j_high]))
+		self.videoFrames[frameNumber, :, i_low:i_high, j_low:j_high] = blockValues
 
 #----------------------------------------------------------------------------------------------------------------#
 # Requantize Frame:
@@ -249,7 +264,7 @@ class videoData:
 		for h_offset in range(i-block_size//2,i+block_size//2,8):
 			for w_offset in range(j-block_size//2,j+block_size//2,8):
 
-				if(h_offset<0 or w_offset<0):
+				if(h_offset<0 or w_offset<0 or h_offset>=self.height or w_offset>=self.width):
 					continue
 
 				blocks = ((h_offset//8)*120+(w_offset//8)+frameNumber*8160)
@@ -266,7 +281,14 @@ class videoData:
 
 		for index1,rows in enumerate(blockList):
 			for index2,columns in enumerate(rows):
+
+				if(not np.shape(patch[:,index1*8:8*(index1+1),index2*8:8*(index2+1)])==(3,8,8)):
+					#print(index1,index2,np.shape(patch[:,index1*8:8*(index1+1),index2*8:8*(index2+1)]),np.shape(patch))
+					patch[:,index1*8-4:8*(index1+1),index2*8:8*(index2+1)] = self.decompressor.computeIDCT(columns)
+					continue
+
 				patch[:,index1*8:8*(index1+1),index2*8:8*(index2+1)] = self.decompressor.computeIDCT(columns)
+				#patch[:,index1*8:8*(index1+1),index2*8:8*(index2+1)] = np.zeros((3,8,8))
 
 		self.setBlock(frameNumber,i-block_size//2,j-block_size//2,block_size,patch)
 

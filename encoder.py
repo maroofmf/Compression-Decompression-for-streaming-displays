@@ -22,6 +22,7 @@ def main():
 
     #------------------------------ Construct objects ----------------------------------#
     vidData = videoData(fileName, height, width, channels)
+    vidData.writeMetaData()
     compressor = compression(vidData);
     searchWin = 20
     segmentor = segmentation(vidData, searchWin)
