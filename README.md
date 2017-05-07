@@ -21,6 +21,10 @@ Processor: 2.7 GHz dual-core i5
 
 ## III. How to run:
 
+**Setting up dependancies:**
+
+> pip3 install -r requirements.txt   
+
 **Input data** => Should be of .rgb format!  
 **Intermediate output** => .npy file  
 
