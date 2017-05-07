@@ -49,8 +49,8 @@ n2 - Background quantization factor
 [3] **segmentation**: Class to perform background-foreground segmentation  
 [4] **encoder**: Main encoding script file  
 [5] **decoder**: Main decoding script file  
-[6] **compression**: Class with compression algorithms (DCT)
-[7] **decompression**: Class with decompression algorithms (IDCT)
+[6] **compression**: Class with compression algorithms (DCT)  
+[7] **decompression**: Class with decompression algorithms (IDCT)  
 [8] **Metadata.txt**: Contains all the encoded video information  
 [9] **metadata/\***: Contains GUI elements  
 
